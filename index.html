@@ -1,0 +1,2368 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SpeedGuard · DC Bukittinggi</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#e8503f">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script>try{var t=localStorage.getItem("sg-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.dataset.theme=t}catch(e){}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+<style>
+:root{--f:"Manrope",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+--bg:#e6e7e3;--card:#f7f7f4;--ink:#1d1f23;--mut:#80858d;--line:#e3e3dc;
+--red:#e8503f;--red2:#d23f2f;--soft:#fde9e6;--crim:#d11f2e;
+--on:#2f9e6a;--gps:#e29a1b;--stale:#8b929c;--off:#bcc1c9;--r:20px;
+--w:#fff;--chip:#ecece6;--hov:#efefe9;--glass:rgba(255,255,255,.94);--track:#e4e4dd;--bd:#d9d9d1;--ink2:#4b4f57;--mapbg:#eceae6}
+[data-theme=dark]{--bg:#121417;--card:#1c1f25;--ink:#eceef1;--mut:#9aa1ac;--line:#2c3038;--soft:rgba(232,80,63,.22);--w:#262a31;--chip:#2c3039;--hov:#2f343d;--glass:rgba(30,33,39,.93);--track:#343841;--bd:#3a3f48;--ink2:#c7ccd4;--mapbg:#1a1d22;--off:#5a606b;color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{font:14px/1.45 var(--f);color:var(--ink);background:var(--bg);font-variant-numeric:tabular-nums}
+h1,h2,h3,p,ul,dl,dd{margin:0}ul{padding:0;list-style:none}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 2px rgba(20,20,20,.04)}
+.btn{border:1px solid var(--bd);background:var(--w);border-radius:12px;padding:8px 14px;font-weight:600;line-height:1.2}
+.btn:hover{background:var(--hov)}.btn.pri{background:var(--red);border-color:var(--red);color:#fff}.btn.pri:hover{background:var(--red2)}
+.btn.warn{color:var(--crim);border-color:#f0c4c4}.btn.sm{padding:5px 11px;font-size:13px}.btn:disabled{opacity:.5;cursor:default}
+input,select{border:1px solid var(--bd);border-radius:12px;padding:9px 12px;background:var(--w);width:100%}
+input:focus,select:focus{border-color:var(--red);outline:none;box-shadow:0 0 0 3px rgba(232,80,63,.2)}
+.hint{color:var(--mut);font-size:13px}.err{color:var(--crim);min-height:1.3em;font-size:13px}
+
+/* masuk */
+#gate{position:fixed;inset:0;z-index:5000;display:grid;grid-template-columns:1.1fr 1fr;background:var(--card)}
+.g-art{position:relative;background:var(--red);color:#fff;padding:56px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+.g-art svg.road{position:absolute;inset:0;width:100%;height:100%}.g-art>*{position:relative}
+.g-brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:24px}
+.g-art h2{font-weight:300;font-size:44px;line-height:1.12;max-width:440px}.g-art h2 b{font-weight:800}
+.g-art ul{margin-top:24px;display:grid;gap:10px;color:#ffe3de}
+.g-art li::before{content:"";display:inline-block;width:18px;height:3px;background:var(--w);vertical-align:middle;margin-right:10px;border-radius:2px}
+.g-form{display:grid;place-items:center;padding:32px}.g-form form{width:min(360px,100%);display:grid;gap:14px}
+.g-form h1{font-weight:800;font-size:28px}.g-form label{display:grid;gap:6px;font-weight:600}.g-form .btn{padding:12px}
+.logo{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:10px;background:var(--red)}
+.g-art .logo{background:#fff}
+
+/* kerangka */
+#app{height:100%;display:grid;grid-template-columns:236px minmax(0,1fr);gap:14px;padding:14px}
+.side{display:flex;flex-direction:column;gap:12px;padding:16px;min-height:0;overflow:auto}
+.brandrow{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+.welcome{display:flex;align-items:center;gap:10px;padding:2px 0 4px}
+.av{display:inline-grid;place-items:center;flex:none;width:38px;height:38px;border-radius:50%;background:#26282d;color:#fff;font-weight:700}
+.welcome small,.fleetsel small{display:block;color:var(--mut);font-size:12px}.welcome b,.fleetsel b{font-weight:700}
+.fleetsel{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--w);border-radius:14px;padding:8px 10px}
+.fleetsel .fl{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--chip);font-weight:700;font-size:12px;color:#5f646c}
+.nav{display:grid;gap:3px}
+.nav button{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:0;background:none;border-radius:12px;padding:10px 12px;font-weight:600;color:var(--ink2)}
+.nav button:hover{background:var(--hov)}.nav button.on{background:var(--red);color:#fff}
+.nav svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.nav em{font-style:normal;margin-left:auto;background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:0 7px;line-height:18px}
+.nav .on em{background:var(--w);color:var(--red)}.nav em:empty{display:none}
+.redcard{position:relative;background:var(--red);color:#fff;border-radius:18px;padding:14px 15px;overflow:hidden}
+.redcard::after{content:"";position:absolute;right:-30px;bottom:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.1)}
+.redcard h4{margin:0;font-weight:500;font-size:16px;display:flex;justify-content:space-between;align-items:baseline}.redcard h4 span{font-size:12px;opacity:.8}
+.redcard .r{display:flex;justify-content:space-between;padding:7px 0 0;font-size:13px;opacity:.95}.redcard .r b{font-weight:700;font-size:15px}
+.addcard{display:grid;justify-items:center;gap:6px;border:2px dashed #f2c3bc;background:transparent;border-radius:16px;padding:16px 10px;color:#6a6e76;font-weight:600}
+.addcard:hover{background:var(--w)}.addcard i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--red);color:#fff;font-style:normal;font-size:22px;line-height:1}
+.side .foot{margin-top:auto;display:grid;gap:8px}
+.main{display:grid;grid-template-rows:auto minmax(0,1fr) 250px;gap:14px;min-height:0;min-width:0}
+.mhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.mhead h1{font-weight:700;font-size:24px;letter-spacing:-.2px}
+#pick{width:auto;min-width:160px;border-radius:99px;padding:7px 14px;background:var(--w);font-weight:600}
+.sp{flex:1}
+.ttl{display:flex;flex-direction:column;line-height:1.15}.ttl span{color:var(--mut);font-weight:600;font-size:13px}
+.sbox{position:relative;width:260px}.sbox input{border-radius:99px;padding-left:36px;background:var(--w) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%2380858d' stroke-width='2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='M11 11l4 4'/%3E%3C/svg%3E") no-repeat 13px center}
+.live{display:flex;align-items:center;gap:7px;color:var(--mut);font-size:13px;white-space:nowrap}.live i{width:8px;height:8px;border-radius:50%;background:var(--off)}
+.live.ok i{background:var(--on);box-shadow:0 0 0 3px rgba(47,158,106,.22)}
+#clock{font-weight:700;min-width:70px;text-align:right}
+.ibtn{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--w)}
+.ibtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ibtn em{position:absolute;top:-3px;right:-3px;background:var(--red);color:#fff;font-style:normal;font-size:11px;border-radius:99px;padding:0 5px;line-height:17px}.ibtn em:empty{display:none}
+.mid{display:grid;grid-template-columns:minmax(0,1fr) 344px;gap:14px;min-height:0}
+.bot{display:grid;grid-template-columns:1.3fr 1fr 1.25fr .85fr;gap:14px;min-height:0}
+
+/* peta */
+.mapcard{position:relative;overflow:hidden;min-height:260px;display:flex;flex-direction:column}
+.kstrip{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.kt{display:flex;align-items:baseline;gap:8px;padding:4px 12px;border-radius:12px;background:var(--chip)}
+.kt span{font-size:12px;color:var(--mut);font-weight:600}.kt b{font-size:20px;font-weight:700;line-height:1.1}
+.kt.alert{background:var(--crim);color:#fff}.kt.alert span{color:#ffd9dc}
+.ksp{flex:1}#fsclock{font-weight:800;font-size:18px;display:none}
+.mapbox{position:relative;flex:1;min-height:0}
+#map{position:absolute;inset:0;background:var(--mapbg)}
+.ovl{position:absolute;z-index:500}.ovl.tl{left:12px;top:12px}.ovl.br{right:12px;bottom:26px}
+.seg{display:flex;background:var(--w);border-radius:99px;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:3px}
+.seg button{border:0;background:none;border-radius:99px;padding:6px 13px;font-weight:600;font-size:13px}.seg button[aria-pressed=true]{background:var(--red);color:#fff}
+.ctl{display:flex;flex-direction:column;background:var(--w);border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.2);overflow:hidden}
+.ctl button{display:grid;place-items:center;width:40px;height:40px;border:0;border-bottom:1px solid var(--line);background:none;font-weight:700;font-size:13px}
+.ctl button:last-child{border-bottom:0}.ctl button:hover{background:var(--hov)}
+.ctl svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ctl .fsonly{display:none}.mapcard.fs .ctl .fsonly,.mapcard.pfs .ctl .fsonly{display:grid}
+.leaflet-control-attribution{font-size:10px!important;background:var(--glass)!important;color:var(--mut)!important;border-radius:8px 0 0 0}.leaflet-control-attribution a{color:var(--mut)!important}
+.leaflet-bottom.leaflet-left .leaflet-control-attribution{border-radius:0 8px 0 0;margin:0}
+[data-theme=dark] #map:not(.sat) .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.95)}
+.alc{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:0;background:var(--soft);border-radius:14px;padding:9px 12px;color:var(--ink)}
+.alc i{display:grid;place-items:center;flex:none;width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;font-style:normal;font-weight:800;font-size:12px}
+.alc small{display:block;color:var(--mut);font-size:11px;font-weight:600}.alc b{display:block;line-height:1.25}.alc span{color:var(--mut);font-size:12px}
+.alc.sos{background:var(--crim);color:#fff}.alc.sos small,.alc.sos span{color:#ffd9dc}.alc.sos i{background:#fff;color:var(--crim)}
+#alertcard{padding:10px 12px 0}
+.mk{position:relative;width:30px;height:30px}
+.mk-c{width:30px;height:30px;border-radius:50%;background:var(--on);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4);display:grid;place-items:center}
+.mk-c svg{width:16px;height:16px;fill:#fff}.mk-c .dot{width:8px;height:8px;border-radius:50%;background:#fff}
+.mk.over .mk-c{background:var(--crim)}.mk.gps .mk-c{background:var(--gps)}.mk.stale .mk-c{background:var(--stale);opacity:.8}
+.mk.over .mk-c::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--crim);animation:pulse 1.4s ease-out infinite}
+.mk.sel .mk-c{box-shadow:0 0 0 4px #f5b301,0 2px 6px rgba(0,0,0,.4)}
+.mk-t{color:var(--ink);position:absolute;top:33px;left:50%;transform:translateX(-50%);white-space:nowrap;background:var(--w);border-radius:8px;padding:1px 8px;font-size:12px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.3)}.mk-t b{font-weight:800}
+@keyframes pulse{from{transform:scale(.8);opacity:1}to{transform:scale(1.5);opacity:0}}
+@media(prefers-reduced-motion:reduce){.mk.over .mk-c::after{animation:none}}
+/* layar penuh dan mode TV */
+.mapcard.pfs{position:fixed;inset:0;z-index:2500;border-radius:0}.mapcard.fs,.mapcard.pfs{border:0;border-radius:0}
+.mapcard.fs #fsclock,.mapcard.pfs #fsclock{display:block}
+.drawer{display:none;position:absolute;right:12px;top:12px;bottom:12px;width:320px;z-index:600;background:var(--glass);backdrop-filter:blur(8px);border-radius:18px;box-shadow:0 4px 18px rgba(0,0,0,.25);flex-direction:column;overflow:hidden}
+.mapcard.dr-open .drawer{display:flex}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:12px 14px 6px;font-weight:700}.dh button{border:0;background:none;font-size:22px;line-height:1;color:var(--mut)}
+#dlist{overflow:auto;flex:1;padding:0 8px 8px}#alertfs{padding:0 12px 8px}
+.dopen{display:none;position:absolute;right:12px;top:12px;z-index:600}
+.mapcard.fs:not(.dr-open) .dopen,.mapcard.pfs:not(.dr-open) .dopen{display:block}
+.mapcard.dr-open .ovl.br{right:344px}
+.mapcard.tv .kt b{font-size:34px}.mapcard.tv .kt span{font-size:15px}.mapcard.tv #fsclock{font-size:34px}
+.mapcard.tv .mk{transform:scale(1.35)}.mapcard.tv .ctl{opacity:.4}.mapcard.tv .ctl:hover{opacity:1}
+.mapcard.tv .drawer{width:380px;font-size:16px}.mapcard.tv.dr-open .ovl.br{right:404px}
+/* daftar */
+.listcard{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.rp{display:flex;align-items:center;gap:8px;margin-top:8px}.rp input[type=range]{flex:1;padding:0;border:0;box-shadow:none;accent-color:var(--red);min-width:0}.rp select{width:auto;padding:4px 8px}.rp .btn{width:34px;padding:5px 0}
+.tabs{display:flex;gap:4px;padding:12px 12px 0}
+.tabs button{flex:1;border:0;background:none;border-radius:12px;padding:9px;font-weight:700;color:var(--mut)}
+.tabs button[aria-selected=true]{background:var(--soft);color:var(--red)}
+.tabs em{font-style:normal;background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:0 6px;margin-left:6px}.tabs em:empty{display:none}
+.pane{display:flex;flex-direction:column;min-height:0;flex:1}
+.chips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:12px}
+.chips button{white-space:nowrap;border:1px solid var(--bd);background:var(--w);border-radius:99px;padding:4px 11px;font-size:13px;font-weight:600}
+.chips button b{color:var(--mut);margin-left:5px;font-weight:700}
+.chips button[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}.chips button[aria-pressed=true] b{color:#ffd7d1}
+#list,#alist{overflow:auto;flex:1;padding:0 8px 8px}
+.row{display:grid;grid-template-columns:42px 1fr auto;gap:12px;align-items:center;padding:9px 10px;border-radius:14px;cursor:pointer}
+.row:hover{background:var(--hov)}.row.sel{background:var(--soft)}
+.row .av{width:40px;height:40px;background:var(--w);color:var(--ink2);border:2.5px solid var(--off);font-size:15px}
+.row.on .av{border-color:var(--on)}.row.over .av{border-color:var(--crim);background:var(--crim);color:#fff}.row.gps .av{border-color:var(--gps)}.row.stale .av{border-color:var(--stale)}
+.nm{display:flex;align-items:center;gap:7px;min-width:0}.nm b{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.plate{font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:var(--chip);color:var(--ink2);white-space:nowrap}
+.who{min-width:0}.who small{color:var(--mut)}.nm .plate{flex:none}.nm b{min-width:0}.row.over .who small{color:var(--crim);font-weight:700}
+.spd{text-align:right;line-height:1}.spd b{font-size:24px;font-weight:700}.spd small{display:block;color:var(--mut);font-size:11px;margin-top:3px}
+.row.over .spd b{color:var(--crim)}.row.off .spd b,.row.stale .spd b{color:var(--off)}
+.empty{padding:26px 16px;color:var(--mut);text-align:center}
+.ev{display:grid;grid-template-columns:36px 1fr auto;gap:11px;align-items:center;padding:10px;border-radius:14px;cursor:pointer}
+.ev:hover{background:var(--hov)}.ev i{display:grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--red);font-style:normal;font-weight:800}
+.ev.offline i{background:var(--chip);color:var(--stale)}.ev b{display:block}.ev small{color:var(--mut)}.ev time{color:var(--mut);font-size:12px}
+
+/* kartu bawah */
+.bc{padding:14px 16px;display:flex;flex-direction:column;min-height:0;overflow:auto}
+.bc h3{font-size:14px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.bc h3 button{border:0;background:none;color:var(--red);font-weight:600;font-size:12px;padding:0}
+.bc h3 .x{font-size:20px;color:var(--mut);line-height:1}
+.ph{display:grid;place-items:center;gap:8px;text-align:center;color:var(--mut);flex:1;padding:6px 14px}.ph svg{width:34px;height:34px;fill:none;stroke:#c6c9cf;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.dr{display:flex;align-items:center;gap:12px}.dr .av{width:46px;height:46px;font-size:18px;border:3px solid var(--off);background:var(--w);color:var(--ink)}
+.dr .av.on{border-color:var(--on)}.dr .av.over{border-color:var(--crim);background:var(--crim);color:#fff}.dr .av.gps{border-color:var(--gps)}.dr .av.stale{border-color:var(--stale)}
+.dn{font-size:16px;font-weight:700;display:block}.dm{display:flex;gap:6px;align-items:center;margin-top:2px;flex-wrap:wrap}
+.tag{font-size:11px;font-weight:700;color:#fff;background:var(--off);border-radius:99px;padding:1px 9px}.tag.on{background:var(--on)}.tag.over{background:var(--crim)}.tag.gps{background:var(--gps)}.tag.stale{background:var(--stale)}
+.mini{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:10px 0}
+.mini dt{font-size:11px;color:var(--mut);font-weight:600}.mini dd{font-weight:700}.mini dd.bad{color:var(--crim)}.mini a{color:var(--red2);font-weight:600}
+.trail{display:flex;gap:8px;margin-top:auto;padding-top:10px}.trail input{width:auto;flex:1;min-width:0;padding:6px 10px}
+.gc{display:grid;place-items:center;flex:1;text-align:center}.gc svg{width:100%;max-width:230px;max-height:132px}
+.gc .nn{font-size:34px;font-weight:700;fill:var(--ink)}.gc .uu{font-size:11px;fill:var(--mut);font-weight:600}
+.gc p{color:var(--mut);font-size:13px;margin-top:2px}.gc p b{color:var(--ink)}
+.chartwrap{flex:1;min-height:0;display:flex;flex-direction:column}.chartwrap svg{width:100%;flex:1;min-height:0}
+.stats{display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap}.stats span{background:var(--chip);border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}.stats b{font-weight:800}
+.rcard{position:relative;background:var(--red);border-color:var(--red);color:#fff;overflow:hidden}
+.rcard h3{color:#fff}.rcard::before{content:"";position:absolute;right:0;top:0;bottom:0;width:60%;background-image:radial-gradient(rgba(255,255,255,.28) 1.3px,transparent 1.4px);background-size:11px 11px;-webkit-mask-image:linear-gradient(90deg,transparent,#000);mask-image:linear-gradient(90deg,transparent,#000)}
+.rcard>*{position:relative}.rcard .big{font-size:64px;font-weight:300;line-height:1;margin-top:auto;letter-spacing:-2px}.rcard .big small{font-size:28px;font-weight:300;letter-spacing:0}
+.rcard p{font-size:12.5px;opacity:.92;margin-top:6px}
+
+/* pengaturan */
+#sheet,#recap{position:fixed;inset:0;z-index:3000;background:rgba(29,31,35,.5);display:grid;place-items:center;padding:20px}
+.sbx{background:var(--card);border-radius:24px;width:min(980px,100%);height:min(720px,100%);display:grid;grid-template-rows:auto 1fr;overflow:hidden;box-shadow:0 24px 70px rgba(0,0,0,.35)}
+.sh-h{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--line)}.sh-h h2{font-size:20px;font-weight:700}
+.sh-b{display:grid;grid-template-columns:210px 1fr;min-height:0}
+#snav{border-right:1px solid var(--line);padding:14px;display:grid;gap:3px;align-content:start}
+#snav button{text-align:left;border:0;background:none;padding:10px 13px;border-radius:12px;font-weight:600;color:var(--ink2)}
+#snav button[aria-current=true]{background:var(--red);color:#fff}
+#sbody{overflow:auto;padding:22px 26px;background:var(--w)}
+.lead{margin-bottom:16px;color:var(--ink2)}
+.blk{border:1px solid var(--line);border-radius:16px;margin-bottom:16px;overflow:hidden;background:var(--card)}
+.blk>h3{padding:10px 18px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mut);border-bottom:1px solid var(--line)}
+.blk>p,.blk>.addrow,.blk>ul{margin:14px 18px}
+.fld{display:grid;grid-template-columns:1fr 190px;gap:18px;padding:13px 18px;border-bottom:1px solid var(--line);align-items:center}.fld:last-child{border:0}
+.fl label{font-weight:700;display:block}.fl small{color:var(--mut);display:block;margin-top:2px}
+.fi{display:flex;align-items:center;gap:8px}.fi span{color:var(--mut);min-width:48px}
+.foot{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:6px}.foot .hint,.foot .err{margin-right:auto}
+.chk{display:flex;gap:12px;padding:13px 18px;border-bottom:1px solid var(--line);align-items:flex-start;cursor:pointer}.chk:last-child{border:0}
+.chk input{width:18px;height:18px;margin-top:2px;accent-color:var(--red)}.chk small{display:block;color:var(--mut)}
+.addrow{display:flex;gap:8px}
+.nums{display:flex;flex-wrap:wrap;gap:8px}.nums li{display:flex;align-items:center;gap:8px;background:var(--w);border:1px solid var(--line);border-radius:99px;padding:4px 6px 4px 12px}
+.nums button{border:0;background:var(--chip);border-radius:50%;width:20px;height:20px;line-height:1}
+.bar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+.tbl{width:100%;border-collapse:collapse}.tbl th{background:var(--card);text-align:left;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mut);padding:10px 14px;white-space:nowrap}
+.tbl td{padding:10px 14px;border-top:1px solid var(--line);vertical-align:middle}.tbl td.act{white-space:nowrap;text-align:right}.tbl .muted{color:var(--mut)}
+.pill{font-size:12px;font-weight:600;border-radius:99px;padding:2px 10px;background:#e2f3ea;color:#1b7a4c}.pill.no{background:var(--chip);color:#6c727b}
+#modal{position:fixed;inset:0;z-index:4000;background:rgba(29,31,35,.5);display:grid;place-items:center;padding:16px}
+.mbox{background:var(--w);border-radius:22px;width:min(440px,100%);padding:24px;display:grid;gap:12px;box-shadow:0 24px 70px rgba(0,0,0,.35);max-height:100%;overflow:auto}
+.mbox h3{font-size:20px;font-weight:700}.mbox label{display:grid;gap:5px;font-weight:600}.mbox label small{font-weight:400;color:var(--mut)}.mrow{display:flex;gap:8px}
+.cred{background:var(--card);border:1px dashed var(--bd);border-radius:14px;padding:12px 14px;font-weight:600;line-height:1.8}
+#toasts{position:fixed;top:18px;left:50%;transform:translateX(-50%);z-index:6000;display:grid;gap:8px;width:min(420px,92vw)}
+.toast{background:#26282d;color:#fff;border-radius:14px;padding:12px 16px;box-shadow:0 8px 24px rgba(0,0,0,.3);border-left:5px solid var(--red)}.toast.over{background:var(--crim);border-left-color:#fff}
+
+@media(max-width:1100px){
+ html,body{height:auto}#app{height:auto;grid-template-columns:1fr;padding:8px;gap:10px}
+ .side{flex-direction:row;align-items:center;overflow-x:auto;padding:8px 10px;gap:8px}.side>*{flex:none}
+ .welcome,.fleetsel,.redcard,.addcard,.side .foot .hint{display:none}.nav{display:flex}.nav button{width:auto;padding:8px 12px}.side .foot{margin:0 0 0 auto;display:block}
+ .main{grid-template-rows:auto auto auto}.mid{grid-template-columns:1fr}.mapcard{height:52vh}.listcard{max-height:62vh}
+ .bot{grid-template-columns:1fr 1fr}.bc{min-height:230px}.sbox{width:100%}
+ #gate{grid-template-columns:1fr}.g-art{display:none}
+ .sh-b{grid-template-columns:1fr;grid-template-rows:auto 1fr}#snav{display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}#snav button{white-space:nowrap}
+ .fld{grid-template-columns:1fr}.sbx{height:100%}#sbody{padding:16px}
+}
+@media(max-width:640px){.bot{grid-template-columns:1fr}.mhead h1{font-size:20px}
+ .kt{padding:3px 9px}.kt b{font-size:17px}.kt span{font-size:11px}.ctl button{width:36px;height:36px}.drawer{width:260px}.leaflet-control-zoom{display:none}
+ .sbox{width:100%;order:5}.mhead .sp{display:none}#pick{flex:1}}
+
+.toast.sos{background:var(--crim);border-left-color:#fff;display:flex;gap:12px;align-items:center}.toast.sos b{display:block}.toast.sos button{border:1px solid #fff;background:none;color:#fff;border-radius:10px;padding:4px 10px;font-weight:600}
+.th{display:inline-flex;align-items:center;gap:6px;margin-top:6px;color:var(--mut)}.th input{width:84px;padding:5px 9px}
+.rtool{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}.rtool select{width:auto;min-width:240px}.rtool .sp{flex:1}
+.tbl td.n{text-align:right;font-variant-numeric:tabular-nums}.tbl th.n{text-align:right}.tbl tfoot td{font-weight:800;background:var(--card)}.bad{color:var(--crim);font-weight:700}
+.viewer .adm{display:none!important}
+@media(max-height:820px){
+ html,body{height:auto}#app{height:auto;min-height:100vh}.mid{height:58vh;min-height:380px}.bot{height:auto;min-height:230px}.main{grid-template-rows:auto auto auto}
+ .side{position:sticky;top:14px;max-height:calc(100vh - 28px);gap:8px;padding:12px}.fleetsel{display:none}.nav button{padding:8px 10px}.redcard{padding:10px 12px}.addcard{padding:10px}
+}
+
+/* rapor sopir */
+#rapor{position:fixed;inset:0;z-index:3000;background:rgba(29,31,35,.5);display:grid;place-items:center;padding:20px}
+#rapor .sbx{width:min(1080px,100%);height:min(820px,100%)}
+.rtabs{display:flex;gap:4px;margin:14px 0}.rtabs button{border:0;background:var(--chip);border-radius:99px;padding:7px 16px;font-weight:700;color:var(--ink2)}.rtabs button[aria-selected=true]{background:var(--red);color:#fff}
+.rtool2{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rtool2 select,.rtool2 input[type=date]{width:auto;min-width:150px}.rtool2 .wk{display:flex;align-items:center;gap:6px;color:var(--mut)}.rtool2 .wk input{width:62px;padding:7px 8px}
+.rhead{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;border:1px solid var(--line);border-radius:18px;padding:16px 20px;background:var(--card)}
+.ring{position:relative;width:128px;height:128px}.ring svg{width:128px;height:128px;transform:rotate(-90deg)}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:38px;font-weight:800}
+.ring small{position:absolute;left:0;right:0;bottom:26px;text-align:center;font-size:11px;color:var(--mut);font-weight:600}
+.rhead h3{font-size:22px;font-weight:800}.grade{display:inline-block;color:#fff;border-radius:99px;padding:2px 12px;font-weight:700;font-size:13px;margin:6px 8px 0 0}
+.g-a{background:var(--on)}.g-b{background:#6aa84f}.g-c{background:var(--gps)}.g-d{background:var(--crim)}
+.dl{color:var(--mut);font-size:13px;margin-top:6px}.up{color:var(--on);font-weight:700}.dn2{color:var(--crim);font-weight:700}
+.rgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.rs{border:1px solid var(--line);border-radius:14px;padding:10px 14px;background:var(--card)}.rs small{display:block;color:var(--mut);font-size:12px;font-weight:600}.rs b{font-size:22px;font-weight:800}.rs i{display:block;font-style:normal;color:var(--mut);font-size:12px;margin-top:2px}
+.split{display:flex;height:8px;border-radius:99px;overflow:hidden;background:var(--chip);margin:8px 0 4px}.split i{display:block;background:var(--on);height:100%}
+.pm{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.plist{border:1px solid var(--line);border-radius:14px;overflow:hidden}.plist h4{margin:0;padding:9px 14px;font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:#fff}
+.plist.pos h4{background:var(--on)}.plist.neg h4{background:var(--crim)}
+.plist li{display:flex;justify-content:space-between;gap:12px;padding:9px 14px;border-top:1px solid var(--line)}.plist li span:last-child{font-weight:800;white-space:nowrap}
+.plist .empty{padding:14px;text-align:left;color:var(--mut)}
+.pos li span:last-child{color:var(--on)}.neg li span:last-child{color:var(--crim)}
+.note{border-left:4px solid var(--red);background:var(--soft);border-radius:0 12px 12px 0;padding:10px 14px;margin-top:12px}
+.rank td:first-child{font-weight:800;width:44px}.sc{display:inline-block;min-width:44px;text-align:center;color:#fff;border-radius:99px;padding:1px 8px;font-weight:800}
+.hot li{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;border-top:1px solid var(--line);cursor:pointer}.hot li:hover{background:var(--hov)}
+.hotchip{position:absolute;left:12px;top:58px;z-index:500;display:flex;align-items:center;gap:8px;background:var(--glass);border-radius:99px;padding:5px 8px 5px 14px;box-shadow:0 2px 8px rgba(0,0,0,.2);font-weight:600;font-size:13px}
+.hotchip button{border:0;background:var(--chip);border-radius:50%;width:22px;height:22px;line-height:1}
+@media(max-width:900px){.rhead{grid-template-columns:1fr;justify-items:center;text-align:center}.rgrid{grid-template-columns:1fr 1fr}.pm{grid-template-columns:1fr}#rapor .sbx{height:100%}}
+@media print{
+ body>*:not(#rapor){display:none!important}#rapor{position:static;background:none;padding:0;display:block}
+ #rapor .sbx{box-shadow:none;height:auto;width:100%;display:block}#rapor .sh-h button,.rtool2,.rtabs,.noprint{display:none!important}
+ #rbody2{overflow:visible!important;padding:0!important}
+}
+/* ===== tampilan HP (hanya berlaku di layar ≤ 640px; PC tidak terpengaruh) ===== */
+@media (max-width:640px){
+  body{font-size:14px}
+  #app{padding:8px;gap:10px}
+  .side{padding:10px;gap:8px}
+  .brandrow{font-size:16px}
+  .nav{display:flex;overflow-x:auto;gap:6px;scrollbar-width:none;padding-bottom:2px}
+  .nav::-webkit-scrollbar{display:none}
+  .nav button{flex:none;width:auto;padding:8px 12px;font-size:13px;white-space:nowrap;min-height:40px}
+  .side .foot{margin:0}
+  .mhead{gap:8px 10px;align-items:center}
+  .mhead .ttl h1{font-size:19px;white-space:nowrap}
+  .mhead .ttl span{font-size:12px}
+  #pick{flex:1 1 100%;min-width:0;min-height:44px;font-size:15px}
+  .sbox{width:100%;order:5;flex:1 1 100%}
+  .sbox input{min-height:44px;font-size:15px}
+  .live{font-size:12px}
+  #clock{display:none}
+  .ibtn{width:44px;height:44px}
+  .btn{min-height:40px}
+  #b-install{display:none}
+  .kstrip{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px}
+  .kstrip .ksp,#fsclock{display:none}
+  .kt{padding:6px 10px;justify-content:space-between;min-width:0}
+  .kt span{font-size:12px}
+  .kt b{font-size:18px}
+  .mapcard{min-height:0;height:auto}
+  .mapbox{height:60vh;min-height:340px}
+  .mid{height:auto}
+  .ovl.tl{left:8px;top:8px;right:8px}
+  .seg{width:100%}
+  .seg button{flex:1;padding:8px 6px;font-size:13px;min-height:40px}
+  .ovl.br{right:8px;bottom:14px}
+  .ctl button{width:44px;height:44px}
+  .listcard{max-height:none}
+  .tabs button{min-height:44px;font-size:15px}
+  .row{padding:12px 10px;grid-template-columns:40px 1fr auto}
+  .row .av{width:40px;height:40px}
+  .spd b{font-size:22px}
+  .chips button{min-height:36px;font-size:14px;padding:6px 12px}
+  .bot{grid-template-columns:1fr;gap:10px}
+  .bc{min-height:0}
+  .drawer{width:calc(100% - 16px);left:8px;right:8px;top:auto;bottom:8px;max-height:55%}
+  .mbox{width:calc(100% - 24px);max-height:88vh}
+  .mbox input,.mbox select{min-height:44px;font-size:16px}
+  .sbx{height:100%;width:100%;border-radius:0}
+  .sh-b{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  #snav{display:flex;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line);padding:8px}
+  #snav button{white-space:nowrap;min-height:40px}
+  .fld{grid-template-columns:1fr;gap:8px}
+  .tw{overflow-x:auto}
+  .toast{font-size:14px}
+}
+
+/* ===== laci menu kiri (HP saja; PC tidak berubah) ===== */
+#navtog{display:none}
+#navshade{display:none}
+@media (max-width:640px){
+  #navtog{display:grid;width:44px;height:44px}
+  body.nav-open #navshade{display:block;position:fixed;inset:0;background:rgba(15,31,51,.45);z-index:4400}
+  .side{position:fixed;top:0;left:0;bottom:0;width:270px;max-width:82vw;z-index:4500;flex-direction:column;align-items:stretch;overflow-y:auto;border-radius:0 18px 18px 0;box-shadow:0 10px 40px rgba(0,0,0,.35);transform:translateX(-105%);transition:transform .25s ease;background:var(--card);padding:14px}
+  body.nav-open .side{transform:translateX(0)}
+  .side .welcome,.side .fleetsel,.side .redcard,.side .addcard{display:flex}
+  .side .welcome{display:flex}
+  .side .fleetsel{display:flex}
+  .side .redcard{display:block}
+  .side .addcard{display:grid}
+  .nav{display:grid;overflow:visible;gap:4px}
+  .nav button{width:100%;padding:12px 12px;font-size:15px;min-height:46px;white-space:normal}
+  .side .foot{display:block;margin-top:auto}
+}
+/* ===== HP: susunan daftar dibuat blok biasa (tidak bergantung tinggi layar) ===== */
+@media (max-width:640px){
+  .mid{display:block!important;height:auto!important;min-height:0!important}
+  .mapcard{display:block!important;height:auto!important;flex:none}
+  .listcard{display:block!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+  .listcard .tabs{display:flex;gap:6px}
+  .listcard .tabs button{flex:1;min-height:44px}
+  .pane{display:block!important;flex:none!important;height:auto!important;overflow:visible!important}
+  .pane[hidden]{display:none!important}
+  #list,#alist{overflow:visible!important;flex:none!important;max-height:none!important}
+}
+/* ===== HP: cegah layar melebar (kolom grid tidak boleh lebih lebar dari layar) ===== */
+@media (max-width:640px){
+  #app{grid-template-columns:minmax(0,1fr)!important}
+  .main,.mid,.bot,.mapcard,.listcard,.pane,.chips{min-width:0!important;max-width:100%!important}
+  .listcard .tabs button{min-width:0!important;flex:1 1 0!important}
+  html,body{overflow-x:hidden}
+}
+/* ===== HP: baris filter bisa digeser ke samping, ukuran tab tetap ===== */
+@media (max-width:640px){
+  .chips{display:flex;flex-wrap:nowrap;overflow-x:auto;overflow-y:hidden;width:100%;-webkit-overflow-scrolling:touch;padding:10px 12px}
+  .chips button{flex:none}
+}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="g-art">
+    <svg class="road" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <path d="M-40 690 C 120 560 250 760 400 610 S 620 470 660 500" fill="none" stroke="#f0705f" stroke-width="46" stroke-linecap="round"/>
+      <path d="M-40 690 C 120 560 250 760 400 610 S 620 470 660 500" fill="none" stroke="#fff" stroke-width="2.5" stroke-dasharray="14 16" opacity=".8"/>
+      <path d="M-30 300 C 150 260 220 380 380 330 S 560 220 640 250" fill="none" stroke="#ee6552" stroke-width="30" stroke-linecap="round"/>
+    </svg>
+    <div class="g-brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 24 24"><path d="M12 2l7 19-7-4-7 4z" fill="#e8503f"/></svg></span>SpeedGuard</div>
+    <div><h2>Pantau armada, <b>langsung</b> dari satu layar</h2>
+      <ul><li>Posisi dan kecepatan sopir secara langsung</li><li>Alert overspeed dan koneksi terputus ke WhatsApp</li><li>Riwayat jejak perjalanan per hari</li></ul></div>
+  </div>
+  <div class="g-form">
+    <form id="login">
+      <h1>Masuk sebagai admin</h1>
+      <label>Email<input id="em" type="email" autocomplete="username" required></label>
+      <label>Kata sandi<input id="pw" type="password" autocomplete="current-password" required></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="btn pri" id="lbtn">Masuk</button>
+    </form>
+  </div>
+</div>
+
+<div id="app" hidden>
+  <aside class="side card">
+    <div class="brandrow"><span class="logo"><svg width="18" height="18" viewBox="0 0 24 24"><path d="M12 2l7 19-7-4-7 4z" fill="#fff"/></svg></span>SpeedGuard</div>
+    <div class="welcome"><span class="av" id="av">A</span><div><small>Selamat datang,</small><b id="me">Admin</b></div></div>
+    <div class="fleetsel"><span class="fl">AR</span><div><small>Armada</small><b id="fleet">Armada</b></div></div>
+    <nav class="nav" id="nav">
+      <button data-n="dash" class="on"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Dashboard</button>
+      <button data-n="recap"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Rekap</button>
+      <button data-n="rapor"><svg viewBox="0 0 24 24"><path d="M8 3h8l4 4v14H4V3z"/><path d="M8 13l2.5 2.5L16 10"/></svg>Rapor sopir</button>
+      <button data-n="fleetlist"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>Kendaraan</button>
+      <button data-n="reports"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z M15 3v4h4 M9 12h6 M9 16h6"/></svg>Laporan</button>
+      <button data-n="announce"><svg viewBox="0 0 24 24"><path d="M3 11v2h4l9 5V6L7 11z M18 9a3 3 0 0 1 0 6"/></svg>Pengumuman</button>
+      <button data-n="service"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4l-2.5 2.5-2.2-2.2z"/></svg>Service</button>
+      <button data-n="drivers" class="adm"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14c2.7 0 4.5 1.8 4.5 4.5"/></svg>Sopir</button>
+      <button data-n="audit" class="adm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Riwayat</button>
+      <button data-n="rules" class="adm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>Pengaturan</button>
+    </nav>
+    <div class="redcard"><h4>Hari ini <span id="t-date"></span></h4>
+      <div class="r"><span>Overspeed</span><b id="t-over">0</b></div><div class="r"><span>Koneksi terputus</span><b id="t-off">0</b></div><div class="r"><span>Sopir bertugas</span><b id="t-on">0</b></div></div>
+    <div class="foot"><button class="btn" id="b-out">Keluar</button></div>
+  </aside>
+
+  <div class="main">
+    <header class="mhead">
+      <button class="ibtn" id="navtog" aria-label="Buka menu" title="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <div class="ttl"><h1>Pelacakan armada</h1><span id="sub">DC Bukittinggi</span></div>
+      <select id="pick" aria-label="Pilih sopir"><option value="">Pilih sopir</option></select>
+      <div class="sp"></div>
+      <div class="sbox"><input id="q" type="search" placeholder="Cari nama atau plat" aria-label="Cari sopir"></div>
+      <div class="live" id="live"><i></i><span>Menghubungkan</span></div>
+      <div id="clock"></div>
+      <button class="btn sm" id="b-install" hidden>Pasang aplikasi</button>
+      <button class="ibtn" id="b-theme" aria-label="Ganti tema"><svg viewBox="0 0 24 24"><path d="M21 13A9 9 0 1 1 11 3a7 7 0 0 0 10 10z"/></svg></button>
+      <button class="ibtn" id="b-bell" aria-label="Peringatan"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 1 1 12 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><em id="bbadge"></em></button>
+    </header>
+
+    <div class="mid">
+      <section class="card mapcard" id="mapcard">
+        <div class="kstrip" aria-live="polite">
+          <div class="kt"><span>Bertugas</span><b id="k-on">0</b></div>
+          <div class="kt" id="kp-over"><span>Overspeed</span><b id="k-over">0</b></div>
+          <div class="kt"><span>Bermasalah</span><b id="k-bad">0</b></div>
+          <div class="kt"><span>Sopir aktif</span><b id="k-all">0</b></div>
+          <div class="ksp"></div><div id="fsclock"></div>
+        </div>
+        <div class="mapbox">
+          <div id="map"></div>
+          <div class="ovl tl"><div class="seg"><button id="ly-terang" aria-pressed="true">Terang</button><button id="ly-jalan" aria-pressed="false">Jalan</button><button id="ly-sat" aria-pressed="false">Satelit</button></div></div>
+          <div class="hotchip" id="hotchip" hidden></div>
+          <div class="ovl br"><div class="ctl">
+            <button id="fsbtn" aria-label="Layar penuh" title="Layar penuh"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+            <button id="tvbtn" class="fsonly" aria-label="Mode TV" title="Mode TV">TV</button>
+            <button id="fit" aria-label="Pusatkan" title="Pusatkan semua sopir"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+            <button id="zin" aria-label="Perbesar">+</button><button id="zout" aria-label="Perkecil">−</button></div></div>
+          <aside class="drawer" id="drawer"><div class="dh"><span>Armada</span><button id="dtoggle" aria-label="Tutup daftar">×</button></div><div id="alertfs"></div><ul id="dlist"></ul></aside>
+          <button class="btn sm dopen" id="dopen">Daftar sopir</button>
+        </div>
+      </section>
+      <section class="card listcard">
+        <div id="alertcard" hidden></div>
+        <div class="tabs" id="tabs" role="tablist">
+          <button role="tab" data-t="fleet" aria-selected="true">Armada</button>
+          <button role="tab" data-t="alerts" aria-selected="false">Peringatan<em id="abadge"></em></button>
+        </div>
+        <div class="pane" id="p-fleet"><div class="chips" id="chips"></div><ul id="list"></ul></div>
+        <div class="pane" id="p-alerts" hidden><ul id="alist"></ul></div>
+      </section>
+    </div>
+
+    <div class="bot">
+      <section class="card bc" id="dcard"></section>
+      <section class="card bc" id="gcard"></section>
+      <section class="card bc" id="ccard"></section>
+      <section class="card bc rcard" id="rcard"></section>
+    </div>
+  </div>
+</div>
+
+<div id="navshade" hidden></div>
+<div id="sheet" hidden>
+  <div class="sbx" role="dialog" aria-label="Pengaturan">
+    <div class="sh-h"><h2>Pengaturan</h2><button class="btn sm" id="sclose">Tutup</button></div>
+    <div class="sh-b"><nav id="snav"></nav><div id="sbody"></div></div>
+  </div>
+</div>
+<div id="recap" hidden>
+  <div class="sbx" role="dialog" aria-label="Rekap mingguan">
+    <div class="sh-h"><h2>Rekap mingguan</h2><button class="btn sm" id="rclose">Tutup</button></div>
+    <div id="rbody" style="overflow:auto;padding:22px 26px;background:var(--w)"></div>
+  </div>
+</div>
+<div id="rapor" hidden>
+  <div class="sbx" role="dialog" aria-label="Rapor sopir">
+    <div class="sh-h"><h2>Rapor sopir</h2><div style="display:flex;gap:8px"><button class="btn sm" id="rp-print">Cetak / PDF</button><button class="btn sm" id="rp-close">Tutup</button></div></div>
+    <div id="rbody2" style="overflow:auto;padding:20px 26px;background:var(--w)"></div>
+  </div>
+</div>
+<div id="modal" hidden></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.1.4/leaflet-maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const SGC = window.SG || {};
+const sb = supabase.createClient(SGC.url, SGC.key);
+const FN = SGC.fn || "quick-service";          // nama Edge Function (Supabase > Edge Functions)
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const LABEL = { on: "Bertugas", over: "Overspeed", gps: "GPS bermasalah", stale: "Tidak ada sinyal", off: "Tidak bertugas" };
+const FILTERS = [["all", "Semua"], ["on", "Bertugas"], ["over", "Overspeed"], ["gps", "GPS"], ["stale", "Offline"], ["off", "Off tugas"]];
+
+let S = { stale_after_s: 660, heartbeat_s: 300, speed_limit_kmh: 80, notify_types: [], notify_to: [] };
+let people = [], latest = new Map(), drivers = new Map(), vehicles = [], events = [], shiftsToday = [];
+let filter = "all", q = "", sel = null, tab = "fleet", map = null, base = {}, layer = "terang", trailLayer = null, trailInfo = null, pickSig = "";
+const markers = new Map();
+let meId = null, isAdmin = true, fleetName = "DC Bukittinggi", drawerOpen = true, deferredInstall = null;
+const ALERT_TYPES = ["overspeed", "offline", "gps_lost", "low_battery", "idle", "repeat_overspeed", "sos"];
+// ---------- bantu ----------
+const ageS = t => t ? (Date.now() - new Date(t)) / 1000 : Infinity;
+function ago(t) {
+  if (!t) return "belum ada lokasi";
+  const s = Math.round(ageS(t));
+  if (s < 5) return "baru saja";
+  if (s < 60) return s + " dtk lalu";
+  if (s < 3600) return Math.round(s / 60) + " mnt lalu";
+  if (s < 86400) return Math.round(s / 3600) + " jam lalu";
+  return Math.round(s / 86400) + " hari lalu";
+}
+const WIB = { timeZone: "Asia/Jakarta", hour12: false };
+const fmtT = t => new Date(t).toLocaleTimeString("id-ID", { ...WIB, hour: "2-digit", minute: "2-digit" });
+const fmtD = t => new Date(t).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short" });
+const fmtDT = t => new Date(t).toLocaleString("id-ID", { ...WIB, day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+const dayKey = t => new Date(t).toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+const today = () => dayKey(Date.now());
+const startOfDay = day => new Date(day + "T00:00:00+07:00");
+const initial = n => (n || "?").trim().charAt(0).toUpperCase();
+function toast(msg, kind, click) {
+  const t = document.createElement("div");
+  t.className = "toast " + (kind || ""); t.textContent = msg;
+  if (click) { t.style.cursor = "pointer"; t.onclick = () => { click(); t.remove(); }; }
+  $("#toasts").appendChild(t);
+  setTimeout(() => t.remove(), kind === "over" ? 12000 : 4500);
+}
+let actx;
+function beep() {
+  try {
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.frequency.value = 880; g.gain.value = .08; o.connect(g); g.connect(actx.destination);
+    o.start(); o.stop(actx.currentTime + .25);
+  } catch (e) {}
+}
+function csv(rows, name) {
+  if (!rows.length) return toast("Tidak ada data untuk diunduh.", "err");
+  const keys = Object.keys(rows[0]);
+  const text = "\ufeffsep=;\n" + [keys.join(";"), ...rows.map(r => keys.map(k => JSON.stringify(r[k] ?? "")).join(";"))].join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "text/csv" })); a.download = name; a.click();
+}
+function xlsx(rows, name, sheet) {
+  if (!rows.length) return toast("Tidak ada data untuk diunduh.", "err");
+  if (!window.XLSX) return csv(rows, name + ".csv");
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sheet || "Data"); XLSX.writeFile(wb, name + ".xlsx");
+}
+const genPass = () => Array.from(crypto.getRandomValues(new Uint8Array(8)), b => "abcdefghjkmnpqrstuvwxyz23456789"[b % 31]).join("");
+function normPhone(s) {
+  let d = String(s).replace(/\D/g, "");
+  if (d.startsWith("0")) d = "62" + d.slice(1); else if (d.startsWith("8")) d = "62" + d;
+  return d;
+}
+async function api(action, payload) {
+  const { data, error } = await sb.functions.invoke(FN, { body: { action, ...payload } });
+  if (error) {
+    let msg = "Fungsi server belum bisa dipanggil. Pastikan fungsi " + FN + " sudah diperbarui.";
+    try { const j = await error.context.json(); if (j.error) msg = j.error; } catch (e) {}
+    return { error: msg };
+  }
+  return data?.error ? { error: data.error } : { data };
+}
+// ---------- status ----------
+function stateOf(d) {
+  if (!d.active || !d.status || d.status === "off_duty") return "off";
+  if (d.status === "offline" || ageS(d.received_at) > S.stale_after_s) return "stale";
+  if (d.overspeed) return "over";
+  if (!d.gps_ok) return "gps";
+  return "on";
+}
+function limitOf(d) {
+  const v = vehicles.find(x => x.plate === d.plate);
+  return d.speed_limit_kmh ?? v?.speed_limit_kmh ?? S.speed_limit_kmh;
+}
+function buildDrivers() {
+  drivers = new Map(people.filter(p => p.role === "driver").map(p => [p.id, { ...latest.get(p.id), ...p, driver_id: p.id }]));
+}
+function activeRows() {
+  const order = { over: 0, gps: 1, stale: 2, on: 3, off: 4 };
+  return [...drivers.values()].filter(d => d.active).map(d => ({ ...d, st: stateOf(d) }))
+    .sort((a, b) => order[a.st] - order[b.st] || a.full_name.localeCompare(b.full_name));
+}
+// ---------- tampilan utama ----------
+const ackKey = e => e.driver_id + "|" + e.type + "|" + e.occurred_at;
+let ackedSet = new Set(JSON.parse(localStorage.getItem("sg_acked") || "[]"));
+function ackAlert(k) {
+  ackedSet.add(k);
+  localStorage.setItem("sg_acked", JSON.stringify([...ackedSet].slice(-300)));
+  renderAlerts();
+}
+ function evInfo(e) {
+  const nm = drivers.get(e.driver_id)?.full_name || "Sopir";
+  const m = {
+    overspeed: [`Overspeed ${Math.round(e.speed_kmh)} km/jam`, `batas ${Math.round(e.limit_kmh)} · ${e.duration_s} dtk`, "!"],
+    offline: ["Koneksi terputus", "lokasi terakhir tercatat", "!"],
+    gps_lost: ["GPS bermasalah", "lokasi terakhir tercatat", "!"],
+    low_battery: [`Baterai HP ${e.value}%`, "perlu segera diisi daya", "⚡"],
+    idle: ["Sopir diam terlalu lama", `tidak bergerak ≥ ${e.value} menit`, "⏸"],
+    repeat_overspeed: [`Overspeed berulang (${e.value}×)`, "dalam satu hari", "!!"],
+    sos: ["DARURAT (SOS)", "sopir menekan tombol darurat", "SOS"]
+  }[e.type] || [e.type, "", "!"];
+  return { title: m[0], sub: m[1], icon: m[2], name: nm };
+}
+function rowHtml(d) {
+  const sp = d.st === "off" || d.st === "stale" || d.speed_kmh == null ? "–" : Math.round(d.speed_kmh);
+  return `<li class="row ${d.st}${sel === d.id ? " sel" : ""}" data-id="${d.id}" tabindex="0">
+    <span class="av">${esc(initial(d.full_name))}</span>
+    <div class="who"><div class="nm"><b>${esc(d.full_name)}</b>${d.plate && d.st !== "off" ? `<span class="plate">${esc(d.plate)}</span>` : ""}</div>
+    <small>${LABEL[d.st]}${d.st === "off" ? "" : " · " + ago(d.recorded_at || d.received_at)}</small></div>
+    <div class="spd"><b>${sp}</b><small>km/jam</small></div></li>`;
+}
+function alertHtml(e) {
+  const i = evInfo(e);
+  return `<button class="alc ${e.type === "sos" ? "sos" : ""}" data-key="${esc(ackKey(e))}" data-id="${e.driver_id}" data-lat="${e.lat ?? ""}" data-lng="${e.lng ?? ""}"><i>${i.icon}</i>
+    <div><small>Peringatan terbaru</small><b>${esc(i.title)}</b><span>${esc(i.name)} · ${fmtT(e.occurred_at)}</span></div></button>`;
+}
+function render() {
+  const all = activeRows();
+  const n = k => all.filter(d => d.st === k).length;
+  $("#k-on").textContent = all.filter(d => ["on", "over", "gps"].includes(d.st)).length;
+  $("#k-over").textContent = n("over"); $("#k-bad").textContent = n("gps") + n("stale"); $("#k-all").textContent = all.length;
+  $("#kp-over").classList.toggle("alert", n("over") > 0);
+  const count = k => k === "all" ? all.length : k === "on" ? all.filter(d => ["on", "over", "gps"].includes(d.st)).length : n(k);
+  $("#chips").innerHTML = FILTERS.map(([k, t]) => `<button data-f="${k}" aria-pressed="${k === filter}">${t}<b>${count(k)}</b></button>`).join("");
+  const ql = q.trim().toLowerCase();
+  const list = all.filter(d => filter === "all" || (filter === "on" ? ["on", "over", "gps"].includes(d.st) : d.st === filter))
+    .filter(d => !ql || (d.full_name + " " + (d.plate || "")).toLowerCase().includes(ql));
+  $("#list").innerHTML = list.length ? list.map(rowHtml).join("") : `<li class="empty">${all.length ? "Tidak ada sopir pada filter ini." : "Belum ada sopir. Tambahkan lewat tombol Tambah sopir."}</li>`;
+  $("#dlist").innerHTML = all.map(rowHtml).join("");
+  renderAlerts(); renderToday(all); renderPick(all); renderDetail(); paintDC(); drawDC(); paintEnd(); renderGauge(all); renderChartCard(); drawMarkers();
+}
+function renderAlerts() {
+  const ev = events.filter(e => ALERT_TYPES.includes(e.type));
+  const recent = ev.filter(e => Date.now() - new Date(e.occurred_at) < 864e5 && !ackedSet.has(ackKey(e)));
+  ["#abadge", "#bbadge"].forEach(s => { $(s).textContent = recent.length || ""; });
+  $("#alist").innerHTML = ev.length ? ev.slice(0, 80).map(e => {
+    const i = evInfo(e);
+    return `<li class="ev ${e.type}" data-key="${esc(ackKey(e))}" data-id="${e.driver_id}" data-lat="${e.lat ?? ""}" data-lng="${e.lng ?? ""}"><i>${i.icon}</i>
+      <div><b>${esc(i.title)}</b><small>${esc(i.name)} · ${esc(i.sub)}</small></div><time>${fmtDT(e.occurred_at)}</time></li>`;
+  }).join("") : `<li class="empty">Belum ada peringatan.</li>`;
+  const last = recent[0];
+  ["#alertcard", "#alertfs"].forEach(s => { const c = $(s); c.hidden = !last; if (last) c.innerHTML = alertHtml(last); });
+}
+function todayStats(all) {
+  const t0 = +startOfDay(today());
+  const evT = events.filter(e => +new Date(e.occurred_at) >= t0);
+  const overIds = new Set(evT.filter(e => e.type === "overspeed").map(e => e.driver_id));
+  const duty = new Set([...shiftsToday.map(s => s.driver_id), ...all.filter(d => d.st !== "off").map(d => d.id)]);
+  return { over: evT.filter(e => e.type === "overspeed").length, off: evT.filter(e => e.type === "offline").length, duty: duty.size, overIds, dutySet: duty };
+}
+function renderToday(all) {
+  const t = todayStats(all);
+  $("#t-date").textContent = new Date().toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", day: "numeric", month: "short" });
+  $("#t-over").textContent = t.over; $("#t-off").textContent = t.off; $("#t-on").textContent = t.duty;
+  const bad = [...t.overIds].filter(id => t.dutySet.has(id)).length;
+  const pct = t.duty ? Math.round((1 - bad / t.duty) * 100) : null;
+  $("#rcard").innerHTML = `<h3>Kepatuhan hari ini</h3>
+    <div class="big">${pct == null ? "–" : pct}<small>${pct == null ? "" : "%"}</small></div>
+    <p>${t.duty ? `${t.duty - bad} dari ${t.duty} sopir bertugas tanpa overspeed` : "Belum ada sopir bertugas hari ini"}</p>`;
+}
+function renderPick(all) {
+  const sig = all.map(d => d.id + d.full_name).join("|");
+  if (sig !== pickSig) {
+    pickSig = sig;
+    $("#pick").innerHTML = `<option value="">Pilih sopir</option>` + all.map(d => `<option value="${d.id}">${esc(d.full_name)}</option>`).join("");
+  }
+  $("#pick").value = sel || "";
+}
+// ---------- detail sopir ----------
+function buildDetail() {
+  const c = $("#dcard");
+  if (!sel) {
+    c.innerHTML = `<h3>Detail sopir</h3><div class="ph"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><p>Pilih sopir dari daftar atau klik penanda di peta untuk melihat detail dan jejak perjalanan.</p></div>`;
+    return;
+  }
+  c.innerHTML = `<h3>Detail sopir<button class="x" id="dx" aria-label="Tutup">×</button></h3><div id="dv"></div>
+    <div class="trail"><input type="date" id="td" value="${today()}" aria-label="Tanggal jejak"><button class="btn pri sm" id="tb">Tampilkan jejak</button><button class="btn sm" id="tc">CSV</button><button class="btn sm" id="tr-rapor">Rapor</button></div>`;
+  $("#dx").onclick = closeDetail; $("#tb").onclick = () => loadTrail(false); $("#tc").onclick = () => loadTrail(true); $("#tr-rapor").onclick = () => openRapor(sel);
+}
+function openDetail(id) {
+  sel = id; clearTrail(); trailInfo = null; buildDetail();
+  const d = drivers.get(id);
+  if (d?.lat != null) map.flyTo([d.lat, d.lng], Math.max(map.getZoom(), 15), { duration: .6 });
+  render();
+}
+function closeDetail() { sel = null; clearTrail(); trailInfo = null; buildDetail(); render(); }
+function renderDetail() {
+  const d = sel && drivers.get(sel);
+  if (!d || !$("#dv")) return;
+  const st = stateOf(d), stale = ageS(d.recorded_at) > 120 && st !== "off", off = st === "off";
+  $("#dv").innerHTML = `<div class="dr"><span class="av ${st}">${esc(initial(d.full_name))}</span>
+    <div><b class="dn">${esc(d.full_name)}</b><div class="dm"><span class="plate">${esc(d.plate || "Plat belum ada")}</span><span class="tag ${st}">${LABEL[st]}</span></div></div></div>
+    <dl class="mini"><div><dt>Lokasi diperbarui</dt><dd class="${stale ? "bad" : ""}">${off ? "–" : ago(d.recorded_at)}</dd></div>
+      <div><dt>Kabar dari HP</dt><dd>${off ? "–" : ago(d.received_at)}</dd></div>
+      <div><dt>Baterai</dt><dd>${d.battery_pct == null ? "–" : d.battery_pct + "%"}</dd></div>
+      <div><dt>Akurasi GPS</dt><dd>${d.accuracy_m == null ? "–" : "± " + Math.round(d.accuracy_m) + " m"}</dd></div></dl>
+    ${d.lat == null ? "" : `<a class="hint" style="color:var(--red2);font-weight:600" href="https://www.google.com/maps?q=${d.lat},${d.lng}" target="_blank" rel="noopener">Buka di Google Maps ›</a>`}`;
+}
+// ---------- kecepatan & grafik ----------
+function gaugeSvg(sp, lim) {
+  const max = Math.max(120, Math.ceil(lim * 1.5 / 10) * 10), R = 78, cx = 100, cy = 100;
+  const pt = v => { const a = Math.PI * (1 - v / max); return [cx + R * Math.cos(a), cy - R * Math.sin(a)]; };
+  const arc = (v0, v1) => { const [x0, y0] = pt(v0), [x1, y1] = pt(v1); return `M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
+  const over = sp != null && sp >= lim, [lx, ly] = pt(lim), [lx2, ly2] = [cx + (R + 10) * (lx - cx) / R, cy + (R + 10) * (ly - cy) / R];
+  return `<svg viewBox="0 0 200 118" aria-label="Kecepatan"><path d="${arc(0, max)}" fill="none" style="stroke:var(--track)" stroke-width="13" stroke-linecap="round"/>
+    ${sp ? `<path d="${arc(0, Math.min(sp, max))}" fill="none" stroke="${over ? "#d11f2e" : "#2f9e6a"}" stroke-width="13" stroke-linecap="round"/>` : ""}
+    <line x1="${lx.toFixed(1)}" y1="${ly.toFixed(1)}" x2="${lx2.toFixed(1)}" y2="${ly2.toFixed(1)}" style="stroke:var(--ink)" stroke-width="2.5"/>
+    <text x="100" y="92" text-anchor="middle" class="nn">${sp ?? "–"}</text><text x="100" y="108" text-anchor="middle" class="uu">km/jam · batas ${lim}</text></svg>`;
+}
+function renderGauge(all) {
+  let d = sel && drivers.get(sel), title = "Kecepatan saat ini";
+  if (!d) { d = all.filter(x => ["on", "over", "gps"].includes(x.st)).sort((a, b) => (b.speed_kmh || 0) - (a.speed_kmh || 0))[0]; title = "Tercepat saat ini"; }
+  const st = d && stateOf(d), live = d && st !== "off" && st !== "stale" && d.speed_kmh != null;
+  $("#gcard").innerHTML = `<h3>${title}</h3><div class="gc">${gaugeSvg(live ? Math.round(d.speed_kmh) : null, d ? limitOf(d) : S.speed_limit_kmh)}
+    <p>${d ? `<b>${esc(d.full_name)}</b>${d.plate ? " · " + esc(d.plate) : ""} · ${LABEL[st]}` : "Belum ada sopir yang bertugas"}</p></div>`;
+}
+function lineChart(pts, lim) {
+  const W = 300, H = 100, t0 = +new Date(pts[0].recorded_at), t1 = +new Date(pts[pts.length - 1].recorded_at) || t0 + 1;
+  const ymax = Math.max(lim, ...pts.map(p => p.speed_kmh)) * 1.12, X = t => (t - t0) / Math.max(1, t1 - t0) * W, Y = v => H - v / ymax * H;
+  const line = pts.map(p => `${X(+new Date(p.recorded_at)).toFixed(1)},${Y(p.speed_kmh).toFixed(1)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Grafik kecepatan">
+    <line x1="0" x2="${W}" y1="${Y(lim)}" y2="${Y(lim)}" stroke="#d11f2e" stroke-dasharray="4 3" stroke-width="1"/>
+    <polyline points="${line} ${W},${H} 0,${H}" fill="rgba(232,80,63,.12)" stroke="none"/>
+    <polyline points="${line}" fill="none" stroke="#e8503f" stroke-width="2" vector-effect="non-scaling-stroke"/>
+    <line id="cur" x1="0" x2="0" y1="0" y2="${H}" style="stroke:var(--ink)" stroke-width="1.5" vector-effect="non-scaling-stroke"/></svg>`;
+}
+function barChart() {
+  const days = [];
+  for (let i = 6; i >= 0; i--) { const t = Date.now() - i * 864e5; days.push({ key: dayKey(t), lab: new Date(t).toLocaleDateString("id-ID", { timeZone: "Asia/Jakarta", weekday: "short" }), n: 0 }); }
+  events.filter(e => e.type === "overspeed").forEach(e => { const x = days.find(d => d.key === dayKey(e.occurred_at)); if (x) x.n++; });
+  const mx = Math.max(1, ...days.map(d => d.n)), bw = 26, gap = (300 - 7 * bw) / 6;
+  return `<svg viewBox="0 0 300 118" aria-label="Overspeed 7 hari">${days.map((d, i) => {
+    const h = d.n / mx * 70, x = i * (bw + gap), last = i === 6;
+    return `<rect x="${x.toFixed(1)}" y="${(86 - h).toFixed(1)}" width="${bw}" height="${Math.max(h, 3).toFixed(1)}" rx="6" ${d.n ? `fill="${last ? "#e8503f" : "#f3b3ab"}"` : 'style="fill:var(--track)"'}/>
+      <text x="${(x + bw / 2).toFixed(1)}" y="${(80 - h).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" style="fill:var(--ink)">${d.n || ""}</text>
+      <text x="${(x + bw / 2).toFixed(1)}" y="106" text-anchor="middle" font-size="10" style="fill:var(--mut)">${d.lab}</text>`;
+  }).join("")}</svg>`;
+}
+function renderChartCard(force) {
+  const c = $("#ccard");
+  if (trailInfo) {
+    if (!force && c.dataset.mode === "trail") return;      // jangan ganggu pemutaran ulang yang sedang berjalan
+    c.dataset.mode = "trail"; const t = trailInfo;
+    c.innerHTML = `<h3>Jejak ${esc(t.name)} · ${esc(t.day)}<button id="ct">Tutup jejak</button></h3>
+      <div class="stats"><span>Jarak <b>${t.dist.toFixed(1)} km</b></span><span>Maks <b>${Math.round(t.mx)} km/j</b></span><span>Titik <b>${t.n}</b></span><span>Overspeed <b>${t.over}</b></span></div>
+      <div class="chartwrap">${lineChart(t.data, t.lim)}</div>
+      <div class="rp"><button class="btn sm pri" id="rp-play" aria-label="Putar atau jeda">▶</button><input type="range" id="rp-r" min="0" max="${t.n - 1}" value="0" aria-label="Posisi waktu">
+        <select id="rp-sp" aria-label="Kecepatan putar"><option value="1">1×</option><option value="3" selected>3×</option><option value="8">8×</option></select></div>
+      <p class="hint" id="rp-t">${fmtT(t.data[0].recorded_at)} – ${fmtT(t.data[t.n - 1].recorded_at)} WIB · geser untuk memutar ulang</p>`;
+    $("#ct").onclick = () => { trailInfo = null; clearTrail(); renderChartCard(true); };
+    $("#rp-play").onclick = rpPlay; $("#rp-r").oninput = e => { rpStop(); rpGo(+e.target.value); };
+  } else { c.dataset.mode = "trend"; c.innerHTML = `<h3>Overspeed 7 hari terakhir</h3><div class="chartwrap">${barChart()}</div>`; }
+}
+// ---------- jejak & putar ulang ----------
+const rp = { i: 0, timer: null, mk: null, tail: null };
+function rpStop() { if (rp.timer) { clearInterval(rp.timer); rp.timer = null; } const b = $("#rp-play"); if (b) b.textContent = "▶"; }
+function rpGo(i) {
+  const t = trailInfo; if (!t || !trailLayer) return;
+  i = Math.max(0, Math.min(t.n - 1, i)); rp.i = i;
+  const p = t.data[i], tm = +new Date(p.recorded_at);
+  if (!rp.mk) rp.mk = L.circleMarker([p.lat, p.lng], { radius: 9, color: "#fff", weight: 3, fillColor: "#f5b301", fillOpacity: 1 }).addTo(trailLayer);
+  rp.mk.setLatLng([p.lat, p.lng]);
+  const tail = []; for (let k = i; k >= 0 && tm - +new Date(t.data[k].recorded_at) <= 600000; k--) tail.unshift([t.data[k].lat, t.data[k].lng]);
+  if (!rp.tail) rp.tail = L.polyline(tail, { color: "#f5b301", weight: 7, opacity: .95 }).addTo(trailLayer); else rp.tail.setLatLngs(tail);
+  if (!map.getBounds().pad(-.1).contains([p.lat, p.lng])) map.panTo([p.lat, p.lng]);
+  const r = $("#rp-r"); if (r) r.value = i;
+  const lab = $("#rp-t"); if (lab) lab.textContent = `${fmtT(p.recorded_at)} · ${Math.round(p.speed_kmh)} km/jam${p.overspeed ? " · overspeed" : ""} · ekor 10 menit`;
+  const x = (tm - t.t0) / Math.max(1, t.t1 - t.t0) * 300, cur = $("#cur"); if (cur) { cur.setAttribute("x1", x); cur.setAttribute("x2", x); }
+}
+function rpPlay() {
+  if (rp.timer) return rpStop();
+  if (rp.i >= trailInfo.n - 1) rpGo(0);
+  $("#rp-play").textContent = "❚❚";
+  rp.timer = setInterval(() => { rpGo(rp.i + Number($("#rp-sp").value)); if (rp.i >= trailInfo.n - 1) rpStop(); }, 400);
+}
+function clearTrail() { rpStop(); rp.mk = rp.tail = null; if (trailLayer) { trailLayer.remove(); trailLayer = null; } }
+const rad = x => x * Math.PI / 180;
+function km(a, b) {
+  const h = Math.sin(rad(b.lat - a.lat) / 2) ** 2 + Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(rad(b.lng - a.lng) / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+}
+async function loadTrail(download) {
+  const day = $("#td").value; if (!day) return;
+  const from = startOfDay(day), to = new Date(+from + 864e5), d = drivers.get(sel);
+  const { data, error } = await sb.from("positions").select("recorded_at,lat,lng,speed_kmh,overspeed,accuracy_m")
+    .eq("driver_id", sel).gte("recorded_at", from.toISOString()).lt("recorded_at", to.toISOString()).order("recorded_at").limit(1000);
+  if (error) return toast("Gagal memuat jejak: " + error.message, "err");
+  if (download) return csv(data, `jejak-${d?.full_name || "sopir"}-${day}.csv`);
+  clearTrail();
+  if (!data.length) { trailInfo = null; renderChartCard(true); return toast("Tidak ada catatan pada tanggal ini. Titik hanya disimpan saat kendaraan bergerak."); }
+  const ll = data.map(p => [p.lat, p.lng]);
+  trailLayer = L.layerGroup().addTo(map);
+  L.polyline(ll, { color: "#ffffff", weight: 8, opacity: .9 }).addTo(trailLayer);
+  L.polyline(ll, { color: "#e8503f", weight: 4 }).addTo(trailLayer);
+  L.circleMarker(ll[0], { radius: 7, color: "#fff", weight: 2, fillColor: "#2f9e6a", fillOpacity: 1 }).bindTooltip("Mulai").addTo(trailLayer);
+  L.circleMarker(ll[ll.length - 1], { radius: 7, color: "#fff", weight: 2, fillColor: "#1d1f23", fillOpacity: 1 }).bindTooltip("Terakhir").addTo(trailLayer);
+  data.filter(p => p.overspeed).forEach(p => L.circleMarker([p.lat, p.lng], { radius: 6, color: "#fff", weight: 2, fillColor: "#d11f2e", fillOpacity: 1 })
+    .bindTooltip(`${Math.round(p.speed_kmh)} km/jam · ${fmtT(p.recorded_at)}`).addTo(trailLayer));
+  map.fitBounds(L.latLngBounds(ll), { padding: [60, 60] });
+  let dist = 0; for (let i = 1; i < data.length; i++) dist += km(data[i - 1], data[i]);
+  trailInfo = { data, day: fmtD(from), name: d?.full_name || "", lim: limitOf(d), dist, mx: Math.max(...data.map(p => p.speed_kmh)), n: data.length,
+    over: data.filter(p => p.overspeed).length, t0: +new Date(data[0].recorded_at), t1: +new Date(data[data.length - 1].recorded_at) };
+  renderChartCard(true); rpGo(0);
+}
+// ---------- peta ----------
+function initMap() {
+  map = L.map("map", { zoomControl: false, attributionControl: false }).setView([0.5, 101.5], 7);
+  L.control.attribution({ position: "bottomleft", prefix: false }).addTo(map);
+  const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/";
+  const street = () => L.tileLayer(ESRI + "World_Street_Map/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Tiles © Esri" });
+  const vector = style => {
+    try {
+      if (!window.maplibregl || !L.maplibreGL) return street();
+      return L.maplibreGL({ style: "https://tiles.openfreemap.org/styles/" + style, attribution: "© OpenFreeMap · © OpenMapTiles · Data OpenStreetMap" });
+    } catch (e) { return street(); }
+  };
+  base.terang = vector("positron"); base.jalan = vector("liberty");
+  base.sat = L.layerGroup([L.tileLayer(ESRI + "World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19, attribution: "Imagery © Esri, Maxar" }),
+    L.tileLayer(ESRI + "Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}", { maxZoom: 19 })]);
+  activate(layer, street);
+  $("#ly-terang").onclick = () => setLayer("terang", street); $("#ly-jalan").onclick = () => setLayer("jalan", street); $("#ly-sat").onclick = () => setLayer("sat", street);
+  $("#fit").onclick = fitAll; $("#zin").onclick = () => map.zoomIn(); $("#zout").onclick = () => map.zoomOut();
+  $("#fsbtn").onclick = toggleFs; $("#tvbtn").onclick = toggleTv;
+  $("#dtoggle").onclick = () => setDrawer(false); $("#dopen").onclick = () => setDrawer(true);
+  document.addEventListener("fullscreenchange", onFs);
+  window.addEventListener("resize", () => map.invalidateSize());
+  setInterval(() => { if ($("#mapcard").classList.contains("tv")) fitAll(); }, 30000);
+}
+function activate(k, street) {       // jika peta vektor gagal (tanpa WebGL atau diblokir), pakai peta jalan raster
+  try { base[k].addTo(map); } catch (e) { base[k] = street(); base[k].addTo(map); }
+  const mm = base[k].getMaplibreMap && base[k].getMaplibreMap();
+  if (mm && mm.on) { let n = 0; mm.on("error", () => { if (++n === 6) { map.removeLayer(base[k]); base[k] = street(); base[k].addTo(map); } }); }
+}
+function setLayer(k, street) {
+  if (k === layer) return;
+  map.removeLayer(base[layer]); layer = k; activate(k, street);
+  $("#map").classList.toggle("sat", k === "sat");
+  [["terang", "#ly-terang"], ["jalan", "#ly-jalan"], ["sat", "#ly-sat"]].forEach(([n, s]) => $(s).setAttribute("aria-pressed", n === k));
+}
+function fitAll() {
+  const pts = activeRows().filter(d => d.lat != null && d.st !== "off").map(d => [d.lat, d.lng]);
+  if (pts.length) map.fitBounds(pts, { padding: [80, 80], maxZoom: 15 });
+}
+// layar penuh (Fullscreen API; cadangan "perbesar" untuk browser yang tidak mendukung, mis. Safari iPhone)
+const mc = () => $("#mapcard");
+const isFs = () => document.fullscreenElement === mc() || mc().classList.contains("pfs");
+async function toggleFs() {
+  if (isFs()) return exitFs();
+  try { if (mc().requestFullscreen) await mc().requestFullscreen(); else mc().classList.add("pfs"); } catch (e) { mc().classList.add("pfs"); }
+  onFs();
+}
+function exitFs() { if (document.fullscreenElement) document.exitFullscreen(); mc().classList.remove("pfs"); onFs(); }
+function setDrawer(v) { drawerOpen = v; mc().classList.toggle("dr-open", v && isFs()); setTimeout(() => map.invalidateSize(), 50); }
+function onFs() {
+  const el = mc(), on = isFs();
+  el.classList.toggle("fs", on);
+  if (!on) el.classList.remove("tv", "dr-open"); else el.classList.toggle("dr-open", drawerOpen);
+  (on ? el : document.body).appendChild($("#toasts"));       // agar notifikasi tetap terlihat saat layar penuh
+  $("#fsbtn").setAttribute("aria-label", on ? "Keluar layar penuh" : "Layar penuh");
+  setTimeout(() => { map.invalidateSize(); if (on) fitAll(); }, 250);
+}
+async function toggleTv() {
+  if (!isFs()) await toggleFs();
+  mc().classList.toggle("tv"); setTimeout(() => { map.invalidateSize(); fitAll(); }, 150);
+}
+function pin(d) {
+  const st = stateOf(d), sp = d.speed_kmh == null ? "" : Math.round(d.speed_kmh);
+  const moving = d.heading != null && d.speed_kmh > 3;
+  const inner = moving ? `<svg viewBox="0 0 24 24" style="transform:rotate(${d.heading}deg)"><path d="M12 2l7 19-7-4-7 4z"/></svg>` : `<span class="dot"></span>`;
+  const tag = esc(d.full_name.split(" ")[0]) + (st === "stale" ? " · offline" : sp !== "" ? ` · <b>${sp}</b>` : "");
+  return L.divIcon({ className: "", iconSize: [30, 30], iconAnchor: [15, 15], html: `<div class="mk ${st}${sel === d.id ? " sel" : ""}"><div class="mk-c">${inner}</div><div class="mk-t">${tag}</div></div>` });
+}
+function drawMarkers() {
+  if (!map) return;
+  const seen = new Set();
+  for (const d of drivers.values()) {
+    if (!d.active || d.lat == null || stateOf(d) === "off") continue;
+    seen.add(d.id);
+    let m = markers.get(d.id);
+    if (!m) { m = L.marker([d.lat, d.lng], { icon: pin(d) }).addTo(map).on("click", () => openDetail(d.id)); markers.set(d.id, m); }
+    else { m.setLatLng([d.lat, d.lng]); m.setIcon(pin(d)); }
+    m.setZIndexOffset(sel === d.id ? 1000 : 0);
+  }
+  for (const [id, m] of markers) if (!seen.has(id)) { m.remove(); markers.delete(id); }
+}
+// ---------- dialog kecil ----------
+function ask({ title, note, fields, submit = "Simpan", onSubmit }) {
+  const m = $("#modal");
+  m.innerHTML = `<form class="mbox" autocomplete="off"><h3>${esc(title)}</h3>${note ? `<p class="hint">${note}</p>` : ""}
+    ${fields.map(f => `<label>${esc(f.label)}${f.hint ? `<small>${f.hint}</small>` : ""}
+      ${f.type === "select" ? `<select name="${f.k}">${f.options.map(([v, t]) => `<option value="${v}"${String(f.value) === String(v) ? " selected" : ""}>${t}</option>`).join("")}</select>`
+        : `<span class="mrow"><input name="${f.k}" type="${f.type || "text"}" value="${esc(f.value ?? "")}" placeholder="${esc(f.placeholder || "")}" ${f.required ? "required" : ""}>${f.gen ? `<button type="button" class="btn" data-gen="${f.k}">Acak</button>` : ""}</span>`}</label>`).join("")}
+    <p class="err" id="merr" role="alert"></p>
+    <div class="foot"><button type="button" class="btn" id="mx">Batal</button><button class="btn pri" id="mok">${esc(submit)}</button></div></form>`;
+  m.hidden = false;
+  const form = $("form", m);
+  $("#mx").onclick = () => { m.hidden = true; };
+  form.querySelectorAll("[data-gen]").forEach(b => b.onclick = () => { form.elements[b.dataset.gen].value = genPass(); });
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const v = {}; fields.forEach(f => v[f.k] = form.elements[f.k].value.trim());
+    const okb = $("#mok"); okb.disabled = true;
+    const err = await onSubmit(v);
+    okb.disabled = false;
+    if (err) $("#merr").textContent = err; else if (m.contains(form)) m.hidden = true;   // jika onSubmit membuka dialog info, biarkan
+  };
+  const f0 = fields.length && form.elements[fields[0].k]; if (f0) f0.focus();
+}
+function info(title, html) {
+  const m = $("#modal");
+  m.innerHTML = `<div class="mbox"><h3>${esc(title)}</h3>${html}<div class="foot"><button class="btn pri" id="mx">Selesai</button></div></div>`;
+  m.hidden = false; $("#mx").onclick = () => { m.hidden = true; };
+}
+// ---------- pengaturan ----------
+const STABS = [["rules", "Aturan"], ["dc", "Lokasi DC"], ["notify", "Notifikasi"], ["autoend", "Akhiri tugas"], ["fitur", "Fitur sopir"], ["kode", "Kode masuk"], ["sistem", "Status sistem"], ["koneksi", "Kejadian koneksi"], ["kendara", "Deteksi kendaraan"], ["bbm", "BBM"], ["wilayah", "Wilayah"], ["staff", "Pengguna"]];
+let stab = "rules";
+function openSettings(t) { if (!isAdmin) return; stab = t || stab; $("#sheet .sh-h h2").textContent = "Pengaturan"; $("#snav").style.display = ""; $("#sbody").style.gridColumn = ""; $("#sheet").hidden = false; renderSheet(); }
+function closeSheet() { $("#sheet").hidden = true; setNav(tab === "alerts" ? "alerts" : "dash"); }
+function renderSheet() {
+  $("#snav").innerHTML = STABS.map(([k, t]) => `<button data-s="${k}" ${k === stab ? 'aria-current="true"' : ""}>${t}</button>`).join("");
+  ({ rules: tabRules, dc: tabDC, autoend: tabAutoEnd, fitur: tabFeatures, kode: tabLoginCode, sistem: tabSystem, koneksi: tabKoneksi, kendara: tabKendara, bbm: tabBBM, wilayah: tabWilayah, notify: tabNotify, drivers: tabDrivers, vehicles: tabVehicles, staff: tabStaff, audit: tabAudit })[stab]();
+}
+function setFleet(n) { fleetName = n; $("#fleet").textContent = n; $("#sub").textContent = n; document.title = "SpeedGuard · " + n; }
+async function saveSettings(v) {
+  const { data, error } = await sb.from("app_settings").update(v).eq("fleet_id", S.fleet_id).select();
+  if (error) return error.message;
+  if (!data?.length) return "Perubahan ditolak. Pastikan Anda masuk sebagai admin.";
+  Object.assign(S, data[0]); render(); return null;
+}
+
+const RULES = [
+  ["Pelanggaran kecepatan", [
+    ["speed_limit_kmh", "Batas kecepatan", "km/jam", 1, 10, 200, "Melanggar jika kecepatan sama dengan atau di atas angka ini. Bisa ditimpa per sopir (tab Sopir) atau per kendaraan (tab Kendaraan)."],
+    ["overspeed_seconds", "Lama melewati batas", "detik", 1, 3, 120, "Harus terus-menerus di atas batas selama ini sebelum alert dikirim. Mengurangi alarm palsu akibat GPS."],
+    ["alert_cooldown_s", "Jeda antar alert per sopir", "menit", 60, 1, 120, "Setelah satu alert terkirim, alert sejenis untuk sopir yang sama ditahan selama ini."]]],
+  ["Koneksi", [
+    ["heartbeat_s", "Tanda hidup saat berhenti", "menit", 60, 1, 15, "Saat kendaraan diam, HP mengirim kabar singkat sesuai interval ini agar tidak dianggap terputus."],
+    ["stale_after_s", "Dianggap terputus setelah", "menit", 60, 2, 60, "Sopir yang sedang bertugas tetapi HP-nya tidak mengirim kabar selama ini ditandai terputus dan memicu alert koneksi."]]],
+  ["Pencatatan dan penyimpanan", [
+    ["min_log_speed_kmh", "Catat jejak mulai kecepatan", "km/jam", 1, 0, 60, "Di bawah angka ini kendaraan dianggap berhenti dan titik jejak tidak disimpan."],
+    ["log_interval_s", "Interval catat jejak", "detik", 1, 10, 600, "Jarak waktu antar titik saat bergerak. Makin kecil makin rapat, tetapi memakai kuota dan database lebih banyak."],
+    ["max_accuracy_m", "Akurasi GPS terburuk yang dipakai", "meter", 1, 5, 200, "Titik GPS dengan akurasi lebih buruk dari ini diabaikan untuk penilaian overspeed."],
+    ["retention_days", "Simpan riwayat jejak", "hari", 1, 7, 365, "Data jejak yang lebih lama dihapus otomatis tiap malam."]]]];
+
+function tabRules() {
+  $("#sbody").innerHTML = `<p class="lead">Aturan ini berlaku untuk semua sopir. Perubahan terbaca HP sopir saat menekan <b>Mulai Bertugas</b> berikutnya.</p>
+    <div class="blk"><h3>Identitas</h3><div class="fld"><div class="fl"><label for="r-fname">Nama lokasi</label><small>Tampil sebagai sub judul dashboard dan di pesan WhatsApp.</small></div>
+      <div class="fi"><input id="r-fname" maxlength="40" value="${esc(fleetName)}"></div></div></div>
+    ${RULES.map(([title, fs]) => `<div class="blk"><h3>${title}</h3>${fs.map(([k, lab, unit, mul, min, max, help]) => `
+      <div class="fld"><div class="fl"><label for="r-${k}">${lab}</label><small>${help}</small></div>
+      <div class="fi"><input id="r-${k}" type="number" min="${min}" max="${max}" step="1" value="${Math.round(S[k] / mul * 100) / 100}"><span>${unit}</span></div></div>`).join("")}</div>`).join("")}
+    <div class="foot"><span class="err" id="r-msg"></span><button class="btn pri" id="r-save">Simpan perubahan</button></div>`;
+  $("#r-save").onclick = async () => {
+    const msg = t => { $("#r-msg").textContent = t; }, v = {};
+    for (const [, fs] of RULES) for (const [k, lab, unit, mul, min, max] of fs) {
+      const n = Number($("#r-" + k).value);
+      if (!Number.isFinite(n) || n < min || n > max) return msg(`${lab}: isi angka ${min} sampai ${max} ${unit}.`);
+      v[k] = Math.round(n * mul);
+    }
+    if (v.stale_after_s < v.heartbeat_s * 1.5) return msg("“Dianggap terputus” harus lebih lama dari 1,5 kali tanda hidup agar tidak ada alert palsu.");
+    const fname = $("#r-fname").value.trim();
+    if (!fname) return msg("Nama lokasi tidak boleh kosong.");
+    msg(""); $("#r-save").disabled = true;
+    let err = await saveSettings(v);
+    if (!err && fname !== fleetName) {
+      const { data, error } = await sb.from("fleets").update({ name: fname }).eq("id", S.fleet_id).select();
+      err = error ? error.message : !data?.length ? "Nama lokasi ditolak. Jalankan SQL 005 terlebih dahulu." : null;
+      if (!err) setFleet(fname);
+    }
+    $("#r-save").disabled = false;
+    if (err) msg(err); else toast("Pengaturan tersimpan.");
+  };
+}
+
+const NTYPES = [
+  ["overspeed", "Overspeed", "Kecepatan di atas batas terus-menerus selama durasi yang ditetapkan."],
+  ["dokumen", "Pengingat STNK & KIR", "Ingatkan 30, 14, dan 7 hari sebelum masa berlaku habis, lalu saat sudah habis."],
+  ["jadwal", "Pengingat service", "Ingatkan saat jadwal service (tanggal atau km) hampir tiba atau sudah lewat."],
+  ["offline", "Koneksi terputus", "Sopir sedang bertugas tetapi HP berhenti mengirim kabar."],
+  ["low_battery", "Baterai HP rendah", "Alert saat baterai HP sopir turun di bawah", "low_battery_pct", "%", 5, 50],
+  ["idle", "Sopir diam terlalu lama", "Alert saat sopir yang bertugas tidak bergerak selama", "idle_after_min", "menit", 5, 240],
+  ["repeat_overspeed", "Overspeed berulang", "Alert saat overspeed satu sopir dalam sehari mencapai", "repeat_overspeed_count", "kali", 2, 20],
+  ["weekly", "Rekap mingguan", "Ringkasan minggu lalu dikirim ke WhatsApp tiap Senin pagi (butuh jadwal dari SQL 006)."]];
+function tabNotify() {
+  const nt = S.notify_types || []; let nums = [...(S.notify_to || [])];
+  $("#sbody").innerHTML = `<p class="lead">Atur siapa yang menerima alert WhatsApp dan jenis kejadian apa yang dikirim.</p>
+    <div class="blk"><h3>Jenis alert</h3>
+      ${NTYPES.map(([k, t, d, th, unit, min, max]) => `<label class="chk"><input type="checkbox" id="n-${k}" ${nt.includes(k) ? "checked" : ""}><span><b>${t}</b><small>${d}</small>
+        ${th ? `<span class="th"><input id="th-${k}" type="number" min="${min}" max="${max}" value="${S[th] ?? ""}" aria-label="${t}"> ${unit}</span>` : ""}</span></label>`).join("")}
+      <p class="hint">Tombol darurat (SOS) di aplikasi sopir selalu dikirim ke semua penerima dan tidak bisa dimatikan.</p></div>
+    <div class="blk"><h3>Penerima WhatsApp</h3>
+      <div class="addrow"><input id="n-num" inputmode="tel" placeholder="08123456789 atau 628123456789"><button class="btn" id="n-add">Tambah</button></div>
+      <ul class="nums" id="n-list"></ul>
+      <p class="hint">Gunakan nomor yang berbeda dari nomor pengirim yang tersambung di Fonnte, supaya HP penerima berbunyi.</p></div>
+    <div class="blk"><h3>Pengirim</h3><p class="hint">Token Fonnte dan penyedia pesan disimpan sebagai rahasia di server (Supabase › Edge Functions › Secrets). Sengaja tidak ditampilkan di dashboard demi keamanan.</p></div>
+    <div class="foot"><span class="err" id="n-msg"></span><button class="btn" id="n-test">Simpan lalu kirim pesan uji</button><button class="btn pri" id="n-save">Simpan</button></div>`;
+  const draw = () => { $("#n-list").innerHTML = nums.length ? nums.map((n, i) => `<li><span>+${n}</span><button data-i="${i}" aria-label="Hapus nomor">×</button></li>`).join("") : `<li class="hint" style="padding:0">Belum ada penerima.</li>`; };
+  draw();
+  const add = () => {
+    const n = normPhone($("#n-num").value);
+    if (!/^62\d{8,13}$/.test(n)) return ($("#n-msg").textContent = "Nomor tidak valid. Contoh: 08123456789.");
+    if (nums.includes(n)) return ($("#n-msg").textContent = "Nomor itu sudah ada.");
+    $("#n-msg").textContent = ""; nums.push(n); $("#n-num").value = ""; draw();
+  };
+  $("#n-add").onclick = add; $("#n-num").onkeydown = e => { if (e.key === "Enter") add(); };
+  $("#n-list").onclick = e => { const i = e.target.dataset.i; if (i != null) { nums.splice(+i, 1); draw(); } };
+  const save = async () => {
+    const v = { notify_to: nums, notify_types: NTYPES.filter(([k]) => $("#n-" + k).checked).map(([k]) => k) };
+    for (const [k, t, , th, unit, min, max] of NTYPES) if (th) {
+      const n = Number($("#th-" + k).value);
+      if (!Number.isFinite(n) || n < min || n > max) return `${t}: isi angka ${min} sampai ${max} ${unit}.`;
+      v[th] = Math.round(n);
+    }
+    return saveSettings(v);
+  };
+  $("#n-save").onclick = async () => { const err = await save(); $("#n-msg").textContent = err || ""; if (!err) toast("Pengaturan notifikasi tersimpan."); };
+  $("#n-test").onclick = async () => {
+    $("#n-test").disabled = true; $("#n-msg").textContent = "";
+    let err = await save();
+    if (!err) { const r = await api("test_notify"); err = r.error; if (!err) toast("Pesan uji terkirim. Cek WhatsApp penerima."); }
+    $("#n-msg").textContent = err || ""; $("#n-test").disabled = false;
+  };
+}
+
+function addDriver() {
+  ask({
+    title: "Tambah sopir", submit: "Buat akun", note: "Akun dipakai sopir untuk masuk di aplikasi Android.",
+    fields: [{ k: "full_name", label: "Nama lengkap", required: true }, { k: "username", label: "Username", hint: "Huruf kecil, angka, titik, atau strip. Contoh: budi.santoso", required: true },
+      { k: "password", label: "Kata sandi awal", hint: "Minimal 6 karakter. Berikan ke sopir lalu minta diganti.", value: genPass(), gen: true, required: true },
+      { k: "limit", label: "Batas kecepatan khusus (opsional)", type: "number", hint: "Kosongkan untuk mengikuti batas umum." }],
+    onSubmit: async v => {
+      const r = await api("create_driver", { full_name: v.full_name, username: v.username, password: v.password, speed_limit_kmh: v.limit || null });
+      if (r.error) return r.error;
+      await load();
+      info("Akun sopir dibuat", `<div class="cred">Nama: ${esc(v.full_name)}<br>Username: <b>${esc(v.username.toLowerCase())}</b><br>Kata sandi: <b>${esc(v.password)}</b></div><p class="hint">Catat atau kirim ke sopir sekarang. Kata sandi tidak ditampilkan lagi setelah ini.</p>`);
+      if (!$("#sheet").hidden) renderSheet();
+      return null;
+    }
+  });
+}
+function tabDrivers() {
+  const list = people.filter(p => p.role === "driver");
+  $("#sbody").innerHTML = `<div class="bar-top"><span class="hint">${list.filter(p => p.active).length} sopir aktif dari ${list.length}</span><button class="btn pri" id="d-add">+ Tambah sopir</button></div>
+    <div class="tw"><table class="tbl"><thead><tr><th>Nama</th><th>Username</th><th>Batas khusus</th><th>Status</th><th></th></tr></thead><tbody>
+    ${list.map(p => `<tr><td><b>${esc(p.full_name)}</b></td><td class="muted">${esc((p.email || "").replace(/@speedguard\.app$/, "") || "–")}</td>
+      <td>${p.speed_limit_kmh ? p.speed_limit_kmh + " km/jam" : '<span class="muted">Ikut umum</span>'}</td>
+      <td><span class="pill ${p.active ? "" : "no"}">${p.active ? "Aktif" : "Nonaktif"}</span></td>
+      <td class="act"><button class="btn sm" data-a="edit" data-id="${p.id}">Ubah</button> <button class="btn sm" data-a="pass" data-id="${p.id}">Sandi</button> <button class="btn sm ${p.active ? "warn" : ""}" data-a="tog" data-id="${p.id}">${p.active ? "Nonaktifkan" : "Aktifkan"}</button></td></tr>`).join("") || `<tr><td colspan="5" class="muted">Belum ada sopir.</td></tr>`}
+    </tbody></table></div>
+    <p class="hint" style="margin-top:12px">Sopir yang dinonaktifkan tidak bisa memulai tugas, tetapi riwayatnya tetap tersimpan.</p>`;
+  $("#d-add").onclick = addDriver;
+  $("#sbody").onclick = e => {
+    const b = e.target.closest("[data-a]"); if (!b) return;
+    const p = people.find(x => x.id === b.dataset.id); if (!p) return;
+    if (b.dataset.a === "edit") ask({ title: "Ubah sopir", fields: [{ k: "full_name", label: "Nama lengkap", value: p.full_name, required: true },
+      { k: "limit", label: "Batas kecepatan khusus (opsional)", type: "number", value: p.speed_limit_kmh ?? "", hint: "Kosongkan untuk mengikuti batas umum." }],
+      onSubmit: async v => { const { error } = await sb.from("profiles").update({ full_name: v.full_name, speed_limit_kmh: v.limit ? Number(v.limit) : null }).eq("id", p.id); if (error) return error.message; await load(); renderSheet(); return null; } });
+    if (b.dataset.a === "pass") ask({ title: "Atur ulang kata sandi", note: "Sandi baru untuk " + esc(p.full_name) + ".", submit: "Atur ulang",
+      fields: [{ k: "password", label: "Kata sandi baru", value: genPass(), gen: true, required: true, hint: "Minimal 6 karakter." }],
+      onSubmit: async v => { const r = await api("reset_password", { driver_id: p.id, password: v.password }); if (r.error) return r.error;
+        info("Kata sandi diperbarui", `<div class="cred">Username: <b>${esc((p.email || "").replace(/@speedguard\.app$/, ""))}</b><br>Kata sandi: <b>${esc(v.password)}</b></div>`); return null; } });
+    if (b.dataset.a === "tog") ask({ title: p.active ? "Nonaktifkan sopir?" : "Aktifkan sopir?", submit: p.active ? "Nonaktifkan" : "Aktifkan", fields: [],
+      note: p.active ? esc(p.full_name) + " tidak akan bisa memulai tugas. Riwayat tetap tersimpan." : esc(p.full_name) + " bisa memulai tugas lagi.",
+      onSubmit: async () => { const { error } = await sb.from("profiles").update({ active: !p.active }).eq("id", p.id); if (error) return error.message; await load(); renderSheet(); return null; } });
+  };
+}
+
+function tabVehicles() {
+  $("#sbody").innerHTML = `<div class="bar-top"><span class="hint">Plat terdaftar otomatis memakai batas kecepatan kendaraannya (jika diisi).</span><button class="btn pri" id="v-add">+ Tambah kendaraan</button></div>
+    <div class="tw"><table class="tbl"><thead><tr><th>Plat</th><th>Nama / jenis</th><th>Batas khusus</th><th>Status</th><th></th></tr></thead><tbody>
+    ${vehicles.map(v => `<tr><td><span class="plate">${esc(v.plate)}</span></td><td>${esc(v.name || "–")}</td>
+      <td>${v.speed_limit_kmh ? v.speed_limit_kmh + " km/jam" : '<span class="muted">Ikut umum</span>'}</td><td><span class="pill ${v.active ? "" : "no"}">${v.active ? "Aktif" : "Nonaktif"}</span></td>
+      <td class="act"><button class="btn sm" data-id="${v.id}">Ubah</button></td></tr>`).join("") || `<tr><td colspan="5" class="muted">Belum ada kendaraan terdaftar.</td></tr>`}</tbody></table></div>`;
+  const fields = v => [{ k: "plate", label: "Plat nomor", value: v?.plate, placeholder: "BM 1234 GA", required: true },
+    { k: "name", label: "Nama / jenis (opsional)", value: v?.name, placeholder: "Truk Fuso 01" },
+    { k: "limit", label: "Batas kecepatan khusus (opsional)", type: "number", value: v?.speed_limit_kmh ?? "" },
+    ...(v ? [{ k: "active", label: "Status", type: "select", value: v.active, options: [["true", "Aktif"], ["false", "Nonaktif"]] }] : [])];
+  const norm = s => s.trim().replace(/\s+/g, " ").toUpperCase();
+  $("#v-add").onclick = () => ask({ title: "Tambah kendaraan", fields: fields(),
+    onSubmit: async v => {
+      const { error } = await sb.from("vehicles").insert({ fleet_id: S.fleet_id, plate: norm(v.plate), name: v.name || null, speed_limit_kmh: v.limit ? Number(v.limit) : null });
+      if (error) return error.code === "23505" ? "Plat itu sudah terdaftar." : error.message;
+      await load(); renderSheet(); return null;
+    } });
+  $("#sbody").onclick = e => {
+    const b = e.target.closest("[data-id]"); const v = b && vehicles.find(x => x.id === b.dataset.id); if (!v) return;
+    ask({ title: "Ubah kendaraan", fields: fields(v), onSubmit: async x => {
+      const { error } = await sb.from("vehicles").update({ plate: norm(x.plate), name: x.name || null, speed_limit_kmh: x.limit ? Number(x.limit) : null, active: x.active === "true" }).eq("id", v.id);
+      if (error) return error.code === "23505" ? "Plat itu sudah terdaftar." : error.message;
+      await load(); renderSheet(); return null; } });
+  };
+}
+
+const KEYS = { speed_limit_kmh: "Batas kecepatan", overspeed_seconds: "Lama melewati batas", min_log_speed_kmh: "Catat mulai", log_interval_s: "Interval catat", heartbeat_s: "Tanda hidup",
+  alert_cooldown_s: "Jeda alert", max_accuracy_m: "Akurasi maks", stale_after_s: "Dianggap terputus", retention_days: "Retensi", notify_types: "Jenis alert", notify_to: "Penerima",
+  full_name: "Nama", active: "Aktif", plate: "Plat", name: "Nama kendaraan", role: "Peran" };
+const OBJ = { app_settings: "Pengaturan", profiles: "Akun sopir", vehicles: "Kendaraan" };
+async function tabAudit() {
+  $("#sbody").innerHTML = `<p class="hint">Memuat…</p>`;
+  const { data, error } = await sb.from("audit_log").select("*").order("at", { ascending: false }).limit(80);
+  if (error) { $("#sbody").innerHTML = `<p class="err">${esc(error.message)}</p>`; return; }
+  const fv = v => v == null ? "–" : Array.isArray(v) ? (v.join(", ") || "–") : String(v);
+  const diff = a => {
+    if (a.action === "INSERT") return "Ditambahkan"; if (a.action === "DELETE") return "Dihapus";
+    const o = a.old_row || {}, n = a.new_row || {};
+    return Object.keys(n).filter(k => !["id", "email", "created_at", "fleet_id"].includes(k) && JSON.stringify(n[k]) !== JSON.stringify(o[k]))
+      .map(k => `${KEYS[k] || k}: ${fv(o[k])} → ${fv(n[k])}`).join("; ") || "–";
+  };
+  $("#sbody").innerHTML = `<p class="lead">Catatan perubahan penting pada pengaturan, akun sopir, dan kendaraan.</p><div class="tw"><table class="tbl"><thead><tr><th>Waktu</th><th>Oleh</th><th>Objek</th><th>Perubahan</th></tr></thead><tbody>
+    ${data.map(a => `<tr><td style="white-space:nowrap">${fmtDT(a.at)}</td><td>${esc(people.find(p => p.id === a.actor)?.full_name || "Sistem")}</td><td>${OBJ[a.table_name] || esc(a.table_name)}</td><td>${esc(diff(a))}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">Belum ada catatan.</td></tr>`}</tbody></table></div>`;
+}
+
+const ROLE = { admin: "Admin (penuh)", viewer: "Hanya lihat" };
+function tabStaff() {
+  const list = people.filter(p => p.role !== "driver");
+  $("#sbody").innerHTML = `<div class="bar-top"><span class="hint">Admin boleh mengubah semua pengaturan. Pengguna “Hanya lihat” hanya melihat peta, peringatan, dan rekap.</span><button class="btn pri" id="s-add">+ Tambah pengguna</button></div>
+    <div class="tw"><table class="tbl"><thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th></th></tr></thead><tbody>
+    ${list.map(p => `<tr><td><b>${esc(p.full_name)}</b>${p.id === meId ? ' <span class="muted">(Anda)</span>' : ""}</td><td class="muted">${esc(p.email || "–")}</td><td>${ROLE[p.role] || p.role}</td>
+      <td><span class="pill ${p.active ? "" : "no"}">${p.active ? "Aktif" : "Nonaktif"}</span></td>
+      <td class="act">${p.id === meId ? "" : `<button class="btn sm" data-a="role" data-id="${p.id}">Peran</button> <button class="btn sm" data-a="pass" data-id="${p.id}">Sandi</button> <button class="btn sm ${p.active ? "warn" : ""}" data-a="tog" data-id="${p.id}">${p.active ? "Nonaktifkan" : "Aktifkan"}</button>`}</td></tr>`).join("")}
+    </tbody></table></div>`;
+  $("#s-add").onclick = () => ask({ title: "Tambah pengguna dashboard", submit: "Buat akun",
+    fields: [{ k: "full_name", label: "Nama lengkap", required: true }, { k: "email", label: "Email", type: "email", required: true },
+      { k: "password", label: "Kata sandi awal", value: genPass(), gen: true, required: true, hint: "Minimal 6 karakter." },
+      { k: "role", label: "Peran", type: "select", value: "viewer", options: [["viewer", "Hanya lihat"], ["admin", "Admin (penuh)"]] }],
+    onSubmit: async v => {
+      const r = await api("create_staff", v); if (r.error) return r.error;
+      await load();
+      info("Akun dibuat", `<div class="cred">Email: <b>${esc(v.email)}</b><br>Kata sandi: <b>${esc(v.password)}</b><br>Peran: ${ROLE[v.role]}</div><p class="hint">Kata sandi tidak ditampilkan lagi setelah ini.</p>`);
+      renderSheet(); return null;
+    } });
+  $("#sbody").onclick = e => {
+    const b = e.target.closest("[data-a]"); if (!b) return;
+    const p = people.find(x => x.id === b.dataset.id); if (!p) return;
+    if (b.dataset.a === "role") ask({ title: "Ubah peran", fields: [{ k: "role", label: "Peran untuk " + p.full_name, type: "select", value: p.role, options: [["viewer", "Hanya lihat"], ["admin", "Admin (penuh)"]] }],
+      onSubmit: async v => { const { error } = await sb.from("profiles").update({ role: v.role }).eq("id", p.id); if (error) return error.message; await load(); renderSheet(); return null; } });
+    if (b.dataset.a === "pass") ask({ title: "Atur ulang kata sandi", submit: "Atur ulang", note: "Sandi baru untuk " + esc(p.full_name) + ".",
+      fields: [{ k: "password", label: "Kata sandi baru", value: genPass(), gen: true, required: true, hint: "Minimal 6 karakter." }],
+      onSubmit: async v => { const r = await api("reset_password", { user_id: p.id, password: v.password }); if (r.error) return r.error;
+        info("Kata sandi diperbarui", `<div class="cred">Email: <b>${esc(p.email || "")}</b><br>Kata sandi: <b>${esc(v.password)}</b></div>`); return null; } });
+    if (b.dataset.a === "tog") ask({ title: p.active ? "Nonaktifkan pengguna?" : "Aktifkan pengguna?", submit: p.active ? "Nonaktifkan" : "Aktifkan", fields: [],
+      onSubmit: async () => { const { error } = await sb.from("profiles").update({ active: !p.active }).eq("id", p.id); if (error) return error.message; await load(); renderSheet(); return null; } });
+  };
+}
+// ---------- rekap mingguan ----------
+function weekRanges() {            // 8 minggu terakhir, Senin–Minggu (WIB)
+  const w = new Date(Date.now() + 7 * 36e5), dow = (w.getUTCDay() + 6) % 7;
+  const mon0 = Date.UTC(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate() - dow) - 7 * 36e5;
+  return Array.from({ length: 8 }, (_, i) => {
+    const from = new Date(mon0 - i * 7 * 864e5), to = new Date(+from + 7 * 864e5), lab = `${fmtD(from)} – ${fmtD(+to - 864e5)}`;
+    return { from, to, label: i === 0 ? `Minggu ini (${lab})` : i === 1 ? `Minggu lalu (${lab})` : lab };
+  });
+}
+let recapRows = [];
+function closeRecap() { $("#recap").hidden = true; }
+function openRecap() {
+  setNav("recap"); $("#recap").hidden = false;
+  $("#rbody").innerHTML = `<div class="rtool"><select id="r-week" aria-label="Pilih minggu">${weekRanges().map((w, i) => `<option value="${i}">${w.label}</option>`).join("")}</select><div class="sp"></div>
+    <button class="btn" id="r-xls">Unduh Excel</button><button class="btn pri adm" id="r-wa">Kirim ke WhatsApp</button></div>
+    <div id="r-tbl"><p class="hint">Memuat…</p></div>
+    <p class="hint" style="margin-top:12px">Jarak dihitung dari titik jejak yang tersimpan (estimasi). Jam adalah lama sesi bertugas. Minggu berjalan belum lengkap.</p>`;
+  $("#r-week").onchange = () => loadRecap(+$("#r-week").value);
+  $("#r-xls").onclick = () => {
+    const w = weekRanges()[+$("#r-week").value];
+    xlsx(recapRows.map(r => ({ Sopir: r.full_name, "Hari aktif": r.active_days, "Jam bertugas": Number(r.hours), "Jarak (km)": Number(r.km), "Kecepatan maks (km/jam)": Math.round(r.max_kmh), Overspeed: r.overspeed, "Koneksi terputus": r.offline })),
+      `rekap-${fleetName.replace(/\s+/g, "-")}-${dayKey(w.from)}`, "Rekap");
+  };
+  $("#r-wa").onclick = async () => {
+    const w = weekRanges()[+$("#r-week").value], b = $("#r-wa"); b.disabled = true;
+    const r = await api("weekly_report", { from: w.from.toISOString(), to: w.to.toISOString() });
+    b.disabled = false; toast(r.error || "Rekap terkirim ke WhatsApp.", r.error ? "err" : "");
+  };
+  loadRecap(0);
+}
+async function loadRecap(i) {
+  const w = weekRanges()[i]; $("#r-tbl").innerHTML = `<p class="hint">Memuat…</p>`;
+  const { data, error } = await sb.rpc("weekly_stats", { p_from: w.from.toISOString(), p_to: w.to.toISOString() });
+  if (error) { $("#r-tbl").innerHTML = `<p class="err">Gagal memuat: ${esc(error.message)}. Pastikan SQL 005 sudah dijalankan.</p>`; return; }
+  recapRows = data || [];
+  const sum = k => recapRows.reduce((a, r) => a + Number(r[k]), 0);
+  $("#r-tbl").innerHTML = `<div class="tw"><table class="tbl"><thead><tr><th>Sopir</th><th class="n">Hari aktif</th><th class="n">Jam</th><th class="n">Jarak (km)</th><th class="n">Maks (km/jam)</th><th class="n">Overspeed</th><th class="n">Terputus</th></tr></thead><tbody>
+    ${recapRows.map(r => `<tr><td><b>${esc(r.full_name)}</b></td><td class="n">${r.active_days}</td><td class="n">${Number(r.hours).toLocaleString("id-ID")}</td><td class="n">${Number(r.km).toLocaleString("id-ID")}</td><td class="n">${Math.round(r.max_kmh) || "–"}</td>
+      <td class="n ${r.overspeed ? "bad" : ""}">${r.overspeed || (r.shifts ? '<span class="pill">Bersih</span>' : "–")}</td><td class="n">${r.offline || "–"}</td></tr>`).join("") || `<tr><td colspan="7" class="muted">Belum ada data.</td></tr>`}
+    </tbody><tfoot><tr><td>Total</td><td class="n">${sum("active_days")}</td><td class="n">${sum("hours").toLocaleString("id-ID", { maximumFractionDigits: 1 })}</td><td class="n">${sum("km").toLocaleString("id-ID", { maximumFractionDigits: 1 })}</td><td class="n">${Math.round(Math.max(0, ...recapRows.map(r => r.max_kmh))) || "–"}</td><td class="n">${sum("overspeed")}</td><td class="n">${sum("offline")}</td></tr></tfoot></table></div>`;
+}
+// ---------- rapor sopir ----------
+const RK = { gapMax: 5, breakMin: 15, driveMaxH: 4, stopLongMin: 60 };     // menit, menit, jam, menit
+let work = (() => { try { return JSON.parse(localStorage.getItem("sg-work")) || { s: 5, e: 20 }; } catch (e) { return { s: 5, e: 20 }; } })();
+const rr = { id: null, mode: "day", day: today(), week: 0, tab: "rapor", all: new Map(), prev: null, prog: "", busy: false };
+const raporCache = new Map();
+let hotLayer = null;
+const hod = t => { const d = new Date(t + 7 * 36e5); return d.getUTCHours() + d.getUTCMinutes() / 60; };
+const hm = h => { const m = Math.round(h * 60); return m >= 60 ? `${Math.floor(m / 60)} j ${m % 60 ? (m % 60) + " mnt" : ""}`.trim() : `${m} mnt`; };
+const f1 = n => (Math.round(n * 10) / 10).toLocaleString("id-ID");
+
+async function fetchAll(make) {
+  const out = [];
+  for (let o = 0; ; o += 1000) { const { data, error } = await make().range(o, o + 999); if (error) throw error; out.push(...data); if (data.length < 1000) break; }
+  return out;
+}
+function periodOf(offsetBack = 0) {
+  if (rr.mode === "day") { const from = new Date(+startOfDay(rr.day) - offsetBack * 864e5); return { from, to: new Date(+from + 864e5), label: fmtD(from) }; }
+  const w = weekRanges()[rr.week + offsetBack]; return w ? { from: w.from, to: w.to, label: w.label } : null;
+}
+function calcRapor(d, shifts, evs, pts, from, to) {
+  const now = Date.now(), f = +from, t = Math.min(+to, now), lim = limitOf(d), tm = p => +new Date(p.recorded_at);
+  let dutyMs = 0;
+  for (const s of shifts) { const a = Math.max(+new Date(s.started_at), f), b = Math.min(s.ended_at ? +new Date(s.ended_at) : now, t); if (b > a) dutyMs += b - a; }
+  const offs = evs.filter(e => e.type === "offline").map(e => +new Date(e.occurred_at));
+  let dist = 0, moveMs = 0, overMs = 0, maxKmh = 0, maxViol = 0, outMs = 0, bStart = null, bPrev = null, longest = 0, breaks = 0, stopsLong = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i], tp = tm(p);
+    maxKmh = Math.max(maxKmh, p.speed_kmh); if (p.overspeed) maxViol = Math.max(maxViol, p.speed_kmh);   // hanya titik yang ditandai pelanggaran (melewati batas cukup lama)
+    if (i === 0) { bStart = bPrev = tp; continue; }
+    const q = pts[i - 1], tq = tm(q), gap = tp - tq;
+    if (gap < RK.breakMin * 6e4) {
+      if (gap <= RK.gapMax * 6e4) {
+        dist += km(q, p); moveMs += gap; if (p.overspeed) overMs += gap;
+        const h = hod((tp + tq) / 2); if (h < work.s || h >= work.e) outMs += gap;
+      }
+      bPrev = tp;
+    } else {
+      longest = Math.max(longest, bPrev - bStart); bStart = bPrev = tp;
+      if (!offs.some(o => o >= tq && o <= tp)) { breaks++; if (gap >= RK.stopLongMin * 6e4) stopsLong++; }
+    }
+  }
+  if (bStart != null) longest = Math.max(longest, bPrev - bStart);
+  let offMin = 0;
+  for (const o of offs) { const nx = pts.find(p => tm(p) >= o); const end = nx ? tm(nx) : Math.min(t, o + 120 * 6e4); offMin += Math.min(120, Math.max(0, (end - o) / 6e4)); }
+  const ov = evs.filter(e => e.type === "overspeed");
+  maxViol = Math.max(maxViol, ...ov.map(e => e.speed_kmh || 0));
+  overMs = Math.max(overMs, ov.reduce((a, e) => a + (e.duration_s || 0) * 1000, 0));
+  const byDay = {}; ov.forEach(e => { const k = dayKey(e.occurred_at); byDay[k] = (byDay[k] || 0) + 1; });
+  const thr = S.repeat_overspeed_count || 3;
+  const m = { has: dutyMs > 0 || pts.length > 0 || evs.length > 0, lim, dutyH: dutyMs / 36e5, km: dist, moveH: moveMs / 36e5, maxKmh,
+    avgKmh: moveMs > 0 ? dist / (moveMs / 36e5) : 0, over: ov.length, overMin: overMs / 6e4, maxViol, pctOver: moveMs > 0 ? overMs / moveMs * 100 : 0,
+    repeatDays: Object.values(byDay).filter(n => n >= thr).length, repeatThr: thr, longestH: longest / 36e5, breaks, stopsLong,
+    offN: offs.length, offMin, outMin: outMs / 6e4, sos: evs.filter(e => e.type === "sos").length, pts: pts.length };
+  m.stopH = Math.max(0, m.dutyH - m.moveH); m.per100 = m.over / Math.max(m.km, 20) * 100;
+  m.score = scoreRapor(m);
+  return m;
+}
+function scoreRapor(m) {
+  const items = [], add = (k, label, rule, pts, text) => items.push({ k, label, rule, pts: Math.round(pts * 10) / 10, text });
+  add("over", "Overspeed", "−5 per 1 kejadian per 100 km (maks −35)", m.over ? -Math.min(35, 5 * m.per100) : 0, `${m.over}× (${f1(m.per100)} per 100 km)`);
+  add("sev", "Kecepatan tertinggi saat melanggar", "−0,5 per km/jam di atas batas (maks −10)", m.maxViol > 0 ? -Math.min(10, .5 * (m.maxViol - m.lim)) : 0, `${Math.round(m.maxViol)} km/jam (batas ${m.lim})`);
+  add("time", "Lama di atas batas", "−0,5 per 1% waktu jalan (maks −10)", m.overMin > 0 ? -Math.min(10, .5 * m.pctOver) : 0, `±${Math.round(m.overMin)} mnt (${f1(m.pctOver)}% waktu jalan)`);
+  add("rep", "Overspeed berulang", `−5 jika ≥ ${m.repeatThr}× dalam sehari`, m.repeatDays ? -5 : 0, `${m.repeatDays} hari ≥ ${m.repeatThr}×`);
+  add("fat", "Berkendara tanpa istirahat", `−10 jika ≥ ${RK.driveMaxH} jam beruntun, tambah −2,5 per jam berikutnya (maks −15)`, m.longestH >= RK.driveMaxH ? -Math.min(15, 10 + 2.5 * (m.longestH - RK.driveMaxH)) : 0, `beruntun ${hm(m.longestH)} tanpa jeda ≥ ${RK.breakMin} mnt`);
+  add("conn", "Koneksi terputus", "−2 per kejadian, −1 per 30 mnt (maks −10)", m.offN ? -Math.min(10, 2 * m.offN + m.offMin / 30) : 0, `${m.offN}× (±${Math.round(m.offMin)} mnt)`);
+  add("stop", "Berhenti terlalu lama", `−3 per berhenti ≥ ${RK.stopLongMin} mnt (maks −6)`, m.stopsLong ? -Math.min(6, 3 * m.stopsLong) : 0, `${m.stopsLong}× berhenti ≥ ${RK.stopLongMin} mnt`);
+  add("out", "Di luar jam kerja", `−2 per 30 mnt berkendara di luar ${String(work.s).padStart(2, "0")}.00–${String(work.e).padStart(2, "0")}.00 (maks −8)`, m.outMin > 0 ? -Math.min(8, 2 * m.outMin / 30) : 0, `±${Math.round(m.outMin)} mnt`);
+  add("clean", "Tanpa overspeed", "+5 jika tidak ada overspeed", m.over === 0 && m.km > 0 ? 5 : 0, "tidak ada pelanggaran");
+  add("ok", "Data lengkap, tanpa terputus", "+3 jika tidak ada koneksi terputus", m.offN === 0 && m.dutyH > 0 ? 3 : 0, "tanpa terputus");
+  add("rest", "Istirahat teratur", `+4 jika tidak ada berkendara ≥ ${RK.driveMaxH} jam beruntun (min. 1 jam berkendara)`, m.longestH < RK.driveMaxH && m.moveH >= 1 ? 4 : 0, `beruntun terlama ${hm(m.longestH)}; jeda ≥ ${RK.breakMin} mnt: ${m.breaks}×`);
+  const total = Math.max(0, Math.min(100, Math.round(100 + items.reduce((a, i) => a + i.pts, 0))));
+  return { total, items };
+}
+const gradeOf = n => n >= 90 ? ["Sangat baik", "g-a", "#2f9e6a"] : n >= 75 ? ["Baik", "g-b", "#6aa84f"] : n >= 60 ? ["Perlu pembinaan", "g-c", "#e29a1b"] : ["Perlu tindakan", "g-d", "#d11f2e"];
+
+async function computeFleet(from, to, force) {
+  const key = `${+from}-${+to}`, c = raporCache.get(key);
+  if (!force && c && Date.now() - c.at < 120000) return c.m;
+  const ds = activeRows().filter(d => d.active), ids = ds.map(d => d.id), m = new Map();
+  if (!ids.length) return m;
+  const [shifts, evs] = await Promise.all([
+    fetchAll(() => sb.from("shifts").select("driver_id,started_at,ended_at").in("driver_id", ids).lt("started_at", to.toISOString()).or("ended_at.is.null,ended_at.gte." + from.toISOString()).order("started_at")),
+    fetchAll(() => sb.from("events").select("driver_id,type,occurred_at,speed_kmh,limit_kmh,duration_s,value,lat,lng").in("driver_id", ids).gte("occurred_at", from.toISOString()).lt("occurred_at", to.toISOString()).order("occurred_at"))]);
+  const todo = ds.slice(); let done = 0;
+  const worker = async () => {
+    while (todo.length) {
+      const d = todo.shift(), sh = shifts.filter(x => x.driver_id === d.id), ev = evs.filter(x => x.driver_id === d.id);
+      const pts = sh.length ? await fetchAll(() => sb.from("positions").select("recorded_at,lat,lng,speed_kmh,overspeed").eq("driver_id", d.id).gte("recorded_at", from.toISOString()).lt("recorded_at", to.toISOString()).order("recorded_at")) : [];
+      m.set(d.id, calcRapor(d, sh, ev, pts, from, to)); done++;
+      rr.prog = `Menghitung ${done} dari ${ds.length} sopir…`; const pg = $("#rr-prog"); if (pg) pg.textContent = rr.prog;
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+  raporCache.set(key, { at: Date.now(), m });
+  return m;
+}
+const ranked = () => [...rr.all.entries()].filter(([, m]) => m.has && (m.dutyH > 0 || m.km > 0)).sort((a, b) => b[1].score.total - a[1].score.total || b[1].km - a[1].km);
+
+function openRapor(id) {
+  $("#rapor").hidden = false; setNav("rapor");
+  if (id) rr.id = id; else if (!rr.id) rr.id = activeRows()[0]?.id;
+  renderRapor(); runRapor();
+}
+function closeRapor() { $("#rapor").hidden = true; setNav(tab === "alerts" ? "alerts" : "dash"); }
+async function runRapor(force) {
+  const per = periodOf(); if (!per) return;
+  rr.busy = true; rr.prog = "Menghitung…"; paintRapor();
+  try {
+    rr.all = await computeFleet(per.from, per.to, force);
+    const pv = periodOf(1);
+    rr.prev = pv && rr.id ? (await computeFleetOne(rr.id, pv.from, pv.to)) : null;
+  } catch (e) { toast("Gagal menghitung rapor: " + (e.message || e), "err"); }
+  rr.busy = false; paintRapor();
+}
+async function computeFleetOne(id, from, to) {
+  const d = drivers.get(id); if (!d) return null;
+  const [sh, ev, pts] = await Promise.all([
+    fetchAll(() => sb.from("shifts").select("driver_id,started_at,ended_at").eq("driver_id", id).lt("started_at", to.toISOString()).or("ended_at.is.null,ended_at.gte." + from.toISOString())),
+    fetchAll(() => sb.from("events").select("driver_id,type,occurred_at,speed_kmh,limit_kmh,duration_s,value,lat,lng").eq("driver_id", id).gte("occurred_at", from.toISOString()).lt("occurred_at", to.toISOString())),
+    fetchAll(() => sb.from("positions").select("recorded_at,lat,lng,speed_kmh,overspeed").eq("driver_id", id).gte("recorded_at", from.toISOString()).lt("recorded_at", to.toISOString()).order("recorded_at"))]);
+  return calcRapor(d, sh, ev, pts, from, to);
+}
+function renderRapor() {
+  const ds = activeRows(), per = periodOf();
+  $("#rbody2").innerHTML = `<div class="rtool2">
+      <select id="rr-d" aria-label="Sopir">${ds.map(d => `<option value="${d.id}"${d.id === rr.id ? " selected" : ""}>${esc(d.full_name)}</option>`).join("")}</select>
+      <select id="rr-m" aria-label="Periode"><option value="day"${rr.mode === "day" ? " selected" : ""}>Harian</option><option value="week"${rr.mode === "week" ? " selected" : ""}>Mingguan</option></select>
+      ${rr.mode === "day" ? `<input type="date" id="rr-day" value="${rr.day}">` : `<select id="rr-w">${weekRanges().map((w, i) => `<option value="${i}"${i === rr.week ? " selected" : ""}>${w.label}</option>`).join("")}</select>`}
+      <span class="wk">Jam kerja <input id="rr-ws" type="number" min="0" max="23" value="${work.s}" aria-label="Mulai"> – <input id="rr-we" type="number" min="1" max="24" value="${work.e}" aria-label="Selesai"></span>
+      <span class="hint" id="rr-prog"></span></div>
+    <div class="rtabs" role="tablist"><button data-t="rapor" aria-selected="${rr.tab === "rapor"}">Rapor</button><button data-t="rank" aria-selected="${rr.tab === "rank"}">Peringkat</button><button data-t="hot" aria-selected="${rr.tab === "hot"}">Lokasi rawan</button></div>
+    <div id="rr-body"></div>`;
+  $("#rr-d").onchange = e => { rr.id = e.target.value; runRapor(); };
+  $("#rr-m").onchange = e => { rr.mode = e.target.value; renderRapor(); runRapor(); };
+  if ($("#rr-day")) $("#rr-day").onchange = e => { rr.day = e.target.value || today(); runRapor(); };
+  if ($("#rr-w")) $("#rr-w").onchange = e => { rr.week = +e.target.value; runRapor(); };
+  const wk = () => { const a = Math.max(0, Math.min(23, +$("#rr-ws").value)), b = Math.max(1, Math.min(24, +$("#rr-we").value)); work = { s: a, e: Math.max(b, a + 1) }; try { localStorage.setItem("sg-work", JSON.stringify(work)); } catch (e) {} raporCache.clear(); runRapor(true); };
+  $("#rr-ws").onchange = wk; $("#rr-we").onchange = wk;
+  $(".rtabs").onclick = e => { const t = e.target.closest("[data-t]"); if (t) { rr.tab = t.dataset.t; renderRapor(); paintRapor(); } };
+  paintRapor();
+}
+function delta(a, b, unit = "", goodUp = true, d = 1, neutral = false) {
+  if (b == null || !isFinite(b)) return "";
+  const x = Math.round((a - b) * 10 ** d) / 10 ** d; if (x === 0) return `<span class="hint">sama dengan pembanding</span>`;
+  const good = goodUp ? x > 0 : x < 0;
+  return `<span class="${neutral ? "hint" : good ? "up" : "dn2"}">${x > 0 ? "▲" : "▼"} ${Math.abs(x).toLocaleString("id-ID")}${unit}</span>`;
+}
+function paintRapor() {
+  const body = $("#rr-body"); if (!body) return;
+  const pg = $("#rr-prog"); if (pg) pg.textContent = rr.busy ? rr.prog : "";
+  if (rr.tab === "rank") return paintRank(body);
+  if (rr.tab === "hot") return paintHot(body);
+  const d = drivers.get(rr.id), m = rr.all.get(rr.id), per = periodOf();
+  if (!d || !per) { body.innerHTML = `<p class="hint">Pilih sopir.</p>`; return; }
+  if (!m) { body.innerHTML = `<p class="hint">${rr.busy ? "Menghitung…" : "Belum ada data."}</p>`; return; }
+  if (!m.has || (m.dutyH === 0 && m.km === 0)) { body.innerHTML = `<div class="rhead"><div><h3>${esc(d.full_name)}</h3><p class="dl">${esc(per.label)}</p><p>Tidak bertugas pada periode ini, jadi tidak ada rapor.</p></div></div>`; return; }
+  const sc = m.score.total, [gl, gc, col] = gradeOf(sc), rk = ranked(), pos = rk.findIndex(([id]) => id === rr.id) + 1;
+  const others = rk.map(([, x]) => x), avg = k => others.length ? others.reduce((a, x) => a + (typeof k === "function" ? k(x) : x[k]), 0) / others.length : null;
+  const pv = rr.prev && (rr.prev.dutyH > 0 || rr.prev.km > 0) ? rr.prev : null, pvl = rr.mode === "day" ? "kemarin" : "minggu lalu";
+  const circ = 2 * Math.PI * 52, dash = circ * sc / 100;
+  const goods = m.score.items.filter(i => i.pts > 0), bads = m.score.items.filter(i => i.pts < 0);
+  const worst = bads.slice().sort((a, b) => a.pts - b.pts)[0];
+  const advice = { over: "Briefing singkat soal batas kecepatan dan titik rawan; pantau lagi 1 minggu.", sev: "Ingatkan batas kecepatan di jalur yang dilalui; kecepatan puncak terlalu tinggi.", time: "Terlalu lama di atas batas; bahas pola berkendara dan target waktu tempuh.",
+    rep: "Pelanggaran berulang dalam sehari; perlu pembinaan langsung oleh atasan.", fat: "Atur jeda istirahat tiap 4 jam dan tinjau jadwal rute agar tidak memaksa.", conn: "Cek HP dan izin aplikasi (latar belakang, baterai, sinyal); koneksi sering terputus.",
+    stop: "Periksa penyebab berhenti lama (muat/bongkar, antrean, atau tidak sesuai rute).", out: "Berkendara di luar jam kerja; tinjau jadwal dan beban kerja sopir." }[worst?.k];
+  body.innerHTML = `<div class="rhead">
+      <div class="ring"><svg viewBox="0 0 128 128"><circle cx="64" cy="64" r="52" fill="none" style="stroke:var(--chip)" stroke-width="12"/><circle cx="64" cy="64" r="52" fill="none" stroke="${col}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"/></svg><b style="color:${col}">${sc}</b><small>dari 100</small></div>
+      <div><h3>${esc(d.full_name)} ${d.plate ? `<span class="plate">${esc(d.plate)}</span>` : ""}</h3><span class="grade ${gc}">${gl}</span>${pos ? `<span class="grade" style="background:var(--ink2)">Peringkat ${pos} dari ${rk.length}</span>` : ""}
+        <p class="dl">${rr.mode === "day" ? "Harian" : "Mingguan"} · ${esc(per.label)} · jam kerja ${String(work.s).padStart(2, "0")}.00–${String(work.e).padStart(2, "0")}.00</p>
+        <p class="dl">Skor ${pv ? `${delta(sc, pv.score.total, " poin")} dibanding ${pvl}` : `(belum ada data ${pvl})`}${others.length ? ` · rata-rata armada ${Math.round(avg(x => x.score.total))}` : ""}</p></div></div>
+    <div class="rgrid">
+      <div class="rs"><small>Jam bertugas</small><b>${hm(m.dutyH)}</b><i>armada ${others.length ? hm(avg("dutyH")) : "–"} ${pv ? "· " + delta(m.dutyH, pv.dutyH, " j", true, 1, true) : ""}</i></div>
+      <div class="rs"><small>Jarak</small><b>${f1(m.km)} km</b><i>armada ${others.length ? f1(avg("km")) : "–"} ${pv ? "· " + delta(m.km, pv.km, " km", true, 1, true) : ""}</i></div>
+      <div class="rs"><small>Jalan vs berhenti</small><b>${hm(m.moveH)} / ${hm(m.stopH)}</b><div class="split"><i style="width:${m.dutyH ? Math.min(100, m.moveH / m.dutyH * 100) : 0}%"></i></div><i>${m.dutyH ? Math.round(Math.min(100, m.moveH / m.dutyH * 100)) : 0}% waktu bertugas bergerak</i></div>
+      <div class="rs"><small>Kecepatan rata-rata (saat jalan)</small><b>${Math.round(m.avgKmh)} km/jam</b><i>armada ${others.length ? Math.round(avg("avgKmh")) : "–"}</i></div>
+      <div class="rs"><small>Kecepatan maksimum</small><b>${Math.round(m.maxKmh)} km/jam</b><i>batas ${m.lim} ${pv ? "· " + delta(m.maxKmh, pv.maxKmh, " km/j", false, 0) : ""}</i></div>
+      <div class="rs"><small>Overspeed per 100 km</small><b>${f1(m.per100)}</b><i>armada ${others.length ? f1(avg("per100")) : "–"} ${pv ? "· " + delta(m.per100, pv.per100, "", false) : ""}</i></div></div>
+    <div class="pm">
+      <div class="plist pos"><h4>Poin baik (+)</h4><ul>${goods.map(i => `<li><span><b>${i.label}</b><br><small class="hint">${i.text}</small></span><span>+${i.pts}</span></li>`).join("") || `<li class="empty">Belum ada poin baik pada periode ini.</li>`}</ul></div>
+      <div class="plist neg"><h4>Poin buruk (−)</h4><ul>${bads.map(i => `<li><span><b>${i.label}</b><br><small class="hint">${i.text}</small></span><span>${String(i.pts).replace("-", "−")}</span></li>`).join("") || `<li class="empty">Tidak ada poin buruk. Bagus!</li>`}</ul></div></div>
+    ${worst && sc < 90 ? `<div class="note"><b>Saran tindak lanjut:</b> ${advice}</div>` : ""}
+    <div class="blk" style="margin-top:16px"><h3>Rumus skor (transparan)</h3><div class="tw" style="border:0;border-radius:0"><table class="tbl"><thead><tr><th>Komponen</th><th>Aturan</th><th>Nilai periode ini</th><th class="n">Poin</th></tr></thead><tbody>
+      <tr><td><b>Nilai dasar</b></td><td class="muted">Semua sopir mulai dari 100</td><td></td><td class="n">100</td></tr>
+      ${m.score.items.map(i => `<tr><td>${i.label}</td><td class="muted">${i.rule}</td><td>${i.pts ? i.text : '<span class="muted">–</span>'}</td><td class="n ${i.pts < 0 ? "bad" : i.pts > 0 ? "up" : ""}">${i.pts > 0 ? "+" : ""}${String(i.pts).replace("-", "−")}</td></tr>`).join("")}
+      </tbody><tfoot><tr><td colspan="3">Skor akhir (dibatasi 0–100)</td><td class="n">${sc}</td></tr></tfoot></table></div></div>
+    <p class="hint">Dihitung dari titik jejak GPS, sesi tugas, dan peringatan yang tersimpan. Jarak, waktu jalan, dan lama di atas batas adalah <b>perkiraan</b>; titik hanya tersimpan saat kendaraan bergerak di atas ${S.min_log_speed_kmh} km/jam. Angka pembanding armada memakai sopir yang bertugas pada periode yang sama.</p>`;
+}
+function paintRank(body) {
+  const rk = ranked(), per = periodOf();
+  if (!rk.length) { body.innerHTML = `<p class="hint">${rr.busy ? rr.prog : "Belum ada sopir bertugas pada periode ini."}</p>`; return; }
+  body.innerHTML = `<div class="rtool" style="margin:0 0 12px"><span class="hint">${rr.mode === "day" ? "Harian" : "Mingguan"} · ${esc(per.label)} · ${rk.length} sopir</span><div class="sp"></div><button class="btn" id="rk-x">Unduh Excel</button></div>
+    <div class="tw"><table class="tbl rank"><thead><tr><th>#</th><th>Sopir</th><th>Skor</th><th class="n">Jam</th><th class="n">Jarak (km)</th><th class="n">Overspeed</th><th class="n">per 100 km</th><th class="n">Terputus</th><th>Catatan</th></tr></thead><tbody>
+    ${rk.map(([id, m], i) => { const g = gradeOf(m.score.total), top = m.score.items.filter(x => x.pts < 0).sort((a, b) => a.pts - b.pts)[0];
+      return `<tr style="cursor:pointer" data-id="${id}"><td>${i + 1}</td><td><b>${esc(drivers.get(id)?.full_name || "")}</b></td><td><span class="sc" style="background:${g[2]}">${m.score.total}</span></td><td class="n">${hm(m.dutyH)}</td><td class="n">${f1(m.km)}</td><td class="n ${m.over ? "bad" : ""}">${m.over}</td><td class="n">${f1(m.per100)}</td><td class="n">${m.offN}</td><td class="muted">${top ? top.label : "Tanpa poin buruk"}</td></tr>`; }).join("")}
+    </tbody></table></div><p class="hint" style="margin-top:10px">Klik baris untuk membuka rapor sopir. Skor memakai rumus yang sama untuk semua sopir (lihat tab Rapor).</p>`;
+  body.querySelector("tbody").onclick = e => { const r = e.target.closest("[data-id]"); if (r) { rr.id = r.dataset.id; rr.tab = "rapor"; renderRapor(); runRapor(); } };
+  $("#rk-x").onclick = () => xlsx(rk.map(([id, m], i) => ({ Peringkat: i + 1, Sopir: drivers.get(id)?.full_name, Skor: m.score.total, "Jam bertugas": Math.round(m.dutyH * 10) / 10, "Jarak (km)": Math.round(m.km * 10) / 10, Overspeed: m.over,
+    "Overspeed per 100 km": Math.round(m.per100 * 10) / 10, "Kecepatan tertinggi saat melanggar": Math.round(m.maxViol), "Terputus (kali)": m.offN, "Di luar jam kerja (mnt)": Math.round(m.outMin), "Berkendara beruntun terlama (jam)": Math.round(m.longestH * 10) / 10 })),
+    `peringkat-${rr.mode}-${dayKey(per.from)}`, "Peringkat");
+}
+async function paintHot(body) {
+  const per = periodOf();
+  body.innerHTML = `<p class="hint">Memuat lokasi overspeed…</p>`;
+  let ev;
+  try { ev = await fetchAll(() => sb.from("events").select("driver_id,occurred_at,speed_kmh,lat,lng").eq("type", "overspeed").not("lat", "is", null).gte("occurred_at", per.from.toISOString()).lt("occurred_at", per.to.toISOString()).order("occurred_at")); }
+  catch (e) { body.innerHTML = `<p class="err">${esc(e.message)}</p>`; return; }
+  if (!ev.length) { body.innerHTML = `<p class="hint">Tidak ada kejadian overspeed pada ${esc(per.label)}.</p>`; return; }
+  const cells = new Map();
+  ev.forEach(e => { const k = Math.round(e.lat / .003) + "," + Math.round(e.lng / .003); const c = cells.get(k) || { n: 0, la: 0, ln: 0, ds: new Set(), mx: 0 }; c.n++; c.la += e.lat; c.ln += e.lng; c.ds.add(e.driver_id); c.mx = Math.max(c.mx, e.speed_kmh || 0); cells.set(k, c); });
+  const hot = [...cells.values()].map(c => ({ ...c, la: c.la / c.n, ln: c.ln / c.n })).sort((a, b) => b.n - a.n);
+  const hrs = {}; ev.forEach(e => { const h = Math.floor(hod(+new Date(e.occurred_at))); hrs[h] = (hrs[h] || 0) + 1; });
+  const topH = Object.entries(hrs).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([h, n]) => `${String(h).padStart(2, "0")}.00–${String((+h + 1) % 24).padStart(2, "0")}.00 (${n}×)`);
+  body.innerHTML = `<div class="rtool" style="margin:0 0 12px"><span class="hint">${ev.length} kejadian overspeed · ${esc(per.label)} · ${hot.length} lokasi</span><div class="sp"></div><button class="btn pri" id="ht-show">Tampilkan di peta</button></div>
+    <div class="note" style="margin:0 0 12px"><b>Jam paling rawan:</b> ${topH.join(", ")}</div>
+    <div class="plist hot"><h4 style="background:var(--ink2)">Lokasi paling sering overspeed (area ±300 m)</h4><ul>${hot.slice(0, 10).map((c, i) => `<li data-la="${c.la}" data-ln="${c.ln}"><span><b>${i + 1}.</b> ${c.n} kejadian · ${c.ds.size} sopir · maks ${Math.round(c.mx)} km/jam</span><span class="hint">${c.la.toFixed(4)}, ${c.ln.toFixed(4)} ›</span></li>`).join("")}</ul></div>
+    <p class="hint" style="margin-top:10px">Bahan keputusan: pasang rambu, briefing khusus rute, atau ubah jadwal pada jam rawan. Klik lokasi untuk melihatnya di peta.</p>`;
+  const draw = (focus) => {
+    if (hotLayer) hotLayer.remove(); hotLayer = L.layerGroup().addTo(map);
+    hot.forEach(c => L.circleMarker([c.la, c.ln], { radius: 9 + 4 * Math.sqrt(c.n), color: "#fff", weight: 2, fillColor: "#d11f2e", fillOpacity: .55 }).bindTooltip(`${c.n} kejadian · ${c.ds.size} sopir · maks ${Math.round(c.mx)} km/jam`).addTo(hotLayer));
+    const chip = $("#hotchip"); chip.hidden = false; chip.innerHTML = `Lokasi rawan overspeed · ${esc(per.label)} <button aria-label="Hapus" id="hot-x">×</button>`;
+    $("#hot-x").onclick = () => { hotLayer.remove(); hotLayer = null; chip.hidden = true; };
+    closeRapor(); if (focus) map.flyTo(focus, 16, { duration: .6 }); else map.fitBounds(L.latLngBounds(hot.map(c => [c.la, c.ln])), { padding: [70, 70], maxZoom: 15 });
+  };
+  $("#ht-show").onclick = () => draw();
+  body.querySelector(".hot ul").onclick = e => { const li = e.target.closest("[data-la]"); if (li) draw([+li.dataset.la, +li.dataset.ln]); };
+}
+// ---------- lokasi DC dan perkiraan tiba ----------
+function tabDC() {
+  $("#sbody").innerHTML = `<p class="lead">Titik DC dipakai untuk menghitung jarak dan perkiraan tiba. Ambil koordinat dari Google Maps: klik kanan lokasi DC, lalu salin angka pertama.</p>
+    <div class="blk"><h3>Lokasi DC</h3>
+      <div class="fld"><div class="fl"><label for="dc-lat">Latitude</label><small>Contoh: 0.5123</small></div><div class="fi"><input id="dc-lat" type="number" step="0.00001" value="${S.dc_lat ?? ""}"></div></div>
+      <div class="fld"><div class="fl"><label for="dc-lng">Longitude</label><small>Contoh: 101.4567</small></div><div class="fi"><input id="dc-lng" type="number" step="0.00001" value="${S.dc_lng ?? ""}"></div></div>
+      <div class="fld"><div class="fl"><label for="dc-f">Faktor jalan</label><small>Jarak jalan ≈ jarak lurus × faktor. Mulai dari 1,3.</small></div><div class="fi"><input id="dc-f" type="number" step="0.05" min="1" max="2" value="${S.road_factor ?? 1.3}"></div></div>
+    </div>
+    <div class="foot"><span class="err" id="dc-msg"></span><button class="btn pri" id="dc-save">Simpan lokasi DC</button></div>`;
+  $("#dc-save").onclick = async () => {
+    const la = Number($("#dc-lat").value), ln = Number($("#dc-lng").value), f = Number($("#dc-f").value);
+    if (!(la >= -90 && la <= 90 && ln >= -180 && ln <= 180)) return ($("#dc-msg").textContent = "Latitude atau longitude tidak valid.");
+    if (!(f >= 1 && f <= 2)) return ($("#dc-msg").textContent = "Faktor jalan harus antara 1 dan 2.");
+    const err = await saveSettings({ dc_lat: la, dc_lng: ln, road_factor: f });
+    $("#dc-msg").textContent = err || "";
+    if (!err) toast("Lokasi DC tersimpan.");
+  };
+}
+let avgSpd = null, avgAt = 0;
+async function getAvgSpeed() {
+  if (Date.now() - avgAt < 120000 && avgSpd !== null) return avgSpd;
+  const { data, error } = await sb.rpc("fleet_avg_speed", { p_days: 7 });
+  if (!error) { avgSpd = Number(data) || 0; avgAt = Date.now(); }
+  return avgSpd ?? 0;
+}
+async function paintDC() {
+  const box = $("#dv"), d = sel && drivers.get(sel);
+  if (!box || !d || d.lat == null || S.dc_lat == null || S.dc_lng == null) return;
+  if (stateOf(d) === "off") return;
+  const straight = km({ lat: d.lat, lng: d.lng }, { lat: S.dc_lat, lng: S.dc_lng });
+  const road = straight * (S.road_factor || 1.3);
+  const spd = await getAvgSpeed();
+  if (sel !== d.id) return;                      // sopir sudah diganti saat menunggu
+  const eta = spd > 0 ? Math.round(road / spd * 60) : null;
+  const moving = d.speed_kmh >= 3;
+  box.querySelectorAll(".dcbox").forEach(e => e.remove());
+  box.insertAdjacentHTML("beforeend", `<div class="dcbox" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+    <dl class="mini"><div><dt>Jarak ke DC</dt><dd>${f1(road)} km</dd></div>
+    <div><dt>Perkiraan tiba</dt><dd>${eta == null ? "–" : "± " + eta + " mnt"}</dd></div></dl>
+    <p class="hint" style="font-size:12px">${moving ? "" : "Sopir sedang berhenti. "}Dihitung dengan rata-rata armada ${f1(spd)} km/jam, faktor jalan ${String(S.road_factor ?? 1.3).replace(".", ",")}. Perkiraan, bukan jaminan.</p></div>`);
+}
+// ---------- titik DC di peta ----------
+let dcMarker = null;
+function drawDC() {
+  if (!map) return;
+  if (S.dc_lat == null || S.dc_lng == null) { if (dcMarker) { dcMarker.remove(); dcMarker = null; } return; }
+  if (!dcMarker) {
+    const icon = L.divIcon({ className: "", iconSize: [34, 34], iconAnchor: [17, 17],
+      html: '<div style="width:34px;height:34px;border-radius:10px;background:#1d1f23;color:#fff;display:grid;place-items:center;font-weight:800;font-size:12px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)">DC</div>' });
+    dcMarker = L.marker([S.dc_lat, S.dc_lng], { icon, zIndexOffset: 500 }).addTo(map).bindTooltip("DC Bukittinggi");
+  } else {
+    dcMarker.setLatLng([S.dc_lat, S.dc_lng]);
+  }
+}
+// ---------- status armada (monitoring kendaraan) ----------
+const STAT = {
+  service: ["Sedang service", "#2563eb"], bertugas: ["Sedang bertugas", "#2f9e6a"],
+  dokumen_habis: ["STNK/KIR habis", "#d11f2e"], perlu_service: ["Perlu service", "#e29a1b"],
+  dokumen_akan_habis: ["STNK/KIR akan habis", "#e29a1b"], akan_service: ["Akan service", "#8a94a6"],
+  data_belum_lengkap: ["Data belum lengkap", "#9aa0a8"], stand_by: ["Stand by", "#4b5563"] };
+let vsCache = null, vsAt = 0, vsFilter = "semua", vsQuery = "", upOpen = false, upText = "", upRows = null;
+async function getVehicleStatus(force) {
+  if (!force && vsCache && Date.now() - vsAt < 60000) return vsCache;
+  const { data, error } = await sb.from("vehicle_status").select("*").order("plate");
+  if (error) { toast("Gagal memuat status armada: " + error.message, "bad"); return vsCache || []; }
+  vsCache = data || []; vsAt = Date.now(); return vsCache;
+}
+const nfmt = n => Number(n).toLocaleString("id-ID");
+const sisaTxt = v => v == null ? "–" : v < 0 ? "lewat " + nfmt(-v) : nfmt(v);
+const docTxt = s => s == null ? "–" : s < 0 ? '<b style="color:var(--crim)">habis</b>' : s + " hari";
+function openFleet() { $("#sheet").hidden = false; $("#sheet .sh-h h2").textContent = "Kendaraan"; $("#snav").style.display = "none"; $("#sbody").style.gridColumn = "1 / -1"; renderFleet(false); }
+async function renderFleet(force) { await getVehicleStatus(force); drawFleet(); }
+function drawFleet() {
+  const box = $("#sbody");
+  if (!box.querySelector("#fv-body")) {
+    box.innerHTML = `<div class="bar-top" style="flex-wrap:wrap;gap:8px">
+        <input id="fv-q" type="search" placeholder="Cari plat, merek, atau sopir" style="flex:1;min-width:180px;padding:9px 12px;border:1px solid var(--line);border-radius:999px;background:var(--w)">
+        <button class="btn sm" id="fv-refresh">Muat ulang</button>
+        ${isAdmin ? '<button class="btn sm pri" id="fv-add">+ Tambah kendaraan</button>' : ""}
+        ${isAdmin ? '<button class="btn sm" id="fv-up-toggle">Unggah data</button>' : ""}</div>
+      <div id="fv-chips" style="margin:8px 0;display:flex;gap:6px;flex-wrap:wrap"></div>
+      <div id="fv-up"></div><div id="fv-body"></div>`;
+    $("#fv-q").oninput = e => { vsQuery = e.target.value; drawFleetParts(); };
+    $("#fv-refresh").onclick = async () => { await getVehicleStatus(true); drawFleetParts(); };
+    const add = $("#fv-add"); if (add) add.onclick = () => openVehicleForm(null);
+    const up = $("#fv-up-toggle"); if (up) up.onclick = () => { upOpen = !upOpen; drawFleetParts(); };
+    $("#fv-chips").onclick = e => { const b = e.target.closest("[data-k]"); if (b) { vsFilter = b.dataset.k; drawFleetParts(); } };
+    $("#fv-body").onclick = async e => {
+      if (!isAdmin) return;
+      const ed = e.target.closest("[data-edit]");
+      if (ed) { const v = vehicles.find(x => x.id === ed.dataset.edit); if (v) openVehicleForm(v); return; }
+      const b = e.target.closest("[data-svc]"); if (!b) return;
+      const { error } = await sb.from("vehicles").update({ status_manual: b.dataset.on === "1" ? "service" : "normal" }).eq("id", b.dataset.svc);
+      if (error) return toast(error.message, "bad");
+      await getVehicleStatus(true); drawFleetParts();
+    };
+    $("#fv-up").oninput = e => { if (e.target.id === "up-txt") upText = e.target.value; };
+    $("#fv-up").onclick = async e => {
+      if (e.target.id === "up-prev") { upRows = parseUpload(upText); drawFleetParts(); }
+      if (e.target.id === "up-save") {
+        const ok = (upRows || []).filter(r => !r.err.length);
+        if (!ok.length) return;
+        e.target.disabled = true; e.target.textContent = "Menyimpan…";
+        const res = await saveUpload(ok);
+        toast(`${res.ok} kendaraan disimpan${res.fail.length ? ", " + res.fail.length + " gagal" : ""}.`, res.fail.length ? "bad" : "");
+        if (res.fail.length) alert("Gagal:\n" + res.fail.join("\n"));
+        upRows = null; upText = ""; upOpen = false;
+        await load(); await getVehicleStatus(true); drawFleetParts();
+      }
+    };
+  }
+  drawFleetParts();
+}
+function drawFleetParts() {
+  const list = vsCache || [];
+  const counts = {}; list.forEach(v => counts[v.status_utama] = (counts[v.status_utama] || 0) + 1);
+  const chips = [["semua", "Semua", list.length]].concat(Object.keys(STAT).filter(k => counts[k]).map(k => [k, STAT[k][0], counts[k]]));
+  $("#fv-chips").innerHTML = chips.map(([k, l, n]) => `<button class="btn sm${vsFilter === k ? " pri" : ""}" data-k="${k}">${esc(l)} <b>${n}</b></button>`).join("");
+  const q = vsQuery.trim().toLowerCase();
+  const rows = list.filter(v => (vsFilter === "semua" || v.status_utama === vsFilter) &&
+    (!q || `${v.plate} ${v.merek_tipe || ""} ${v.sopir_aktif || ""}`.toLowerCase().includes(q)));
+  $("#fv-body").innerHTML = `<div class="tw"><table class="tbl"><thead><tr><th>Plat</th><th>Merek</th><th>Status</th><th>Sopir</th>
+      <th>Sisa km</th><th>Sisa hari</th><th>STNK</th><th>KIR</th>${isAdmin ? "<th></th>" : ""}</tr></thead><tbody>
+    ${rows.map(v => { const s = STAT[v.status_utama] || ["–", "#999"]; return `<tr>
+      <td><span class="plate">${esc(v.plate)}</span></td><td>${esc(v.merek_tipe || "–")}</td>
+      <td><span style="background:${s[1]};color:#fff;font-weight:700;font-size:12px;padding:3px 10px;border-radius:999px;white-space:nowrap">${esc(s[0])}</span></td>
+      <td>${esc(v.sopir_aktif || "–")}</td><td>${sisaTxt(v.sisa_km)}</td><td>${sisaTxt(v.sisa_hari)}</td>
+      <td>${docTxt(v.stnk_sisa)}</td><td>${docTxt(v.kir_sisa)}</td>
+      ${isAdmin ? `<td class="act" style="white-space:nowrap"><button class="btn sm" data-edit="${v.id}">Ubah</button> <button class="btn sm" data-svc="${v.id}" data-on="${v.status_manual === "service" ? "0" : "1"}">${v.status_manual === "service" ? "Selesai service" : "Tandai service"}</button></td>` : ""}</tr>`; }).join("") ||
+      `<tr><td colspan="9" class="muted">Tidak ada kendaraan yang cocok.</td></tr>`}</tbody></table></div>`;
+  $("#fv-up").innerHTML = isAdmin && upOpen ? uploadPanel() : "";
+}
+const UP_COLS = ["Plat","Nama / keterangan","Merek/tipe","Batas kecepatan","Odometer terakhir","Tanggal odometer","Interval km","Interval bulan","Service terakhir (tanggal)","Odometer service terakhir","STNK","KIR","Status manual"];
+function uploadPanel() {
+  const rows = upRows;
+  const pre = rows ? `<div style="max-height:260px;overflow:auto;margin-top:8px"><table class="tbl"><thead><tr><th>Baris</th><th>Plat</th><th>Aksi</th><th>Hasil</th></tr></thead><tbody>
+    ${rows.map(r => `<tr style="${r.err.length ? "background:#fdf3f1" : ""}"><td>${r.line}</td><td>${esc(r.plate || "–")}</td>
+      <td>${r.err.length ? "–" : r.isNew ? "Tambah baru" : "Perbarui"}</td>
+      <td>${r.err.length ? '<b style="color:var(--crim)">' + esc(r.err.join("; ")) + "</b>" : '<span style="color:var(--on)">OK</span>'}</td></tr>`).join("")}</tbody></table></div>` : "";
+  const ok = rows ? rows.filter(r => !r.err.length).length : 0;
+  return `<div class="card" style="padding:14px;margin-bottom:10px">
+    <b>Unggah data kendaraan</b>
+    <p class="hint" style="margin:4px 0 8px">Salin dari spreadsheet (kolom sama dengan template: ${esc(UP_COLS.join(" | "))}). Tempel di kotak ini, lalu Pratinjau sebelum menyimpan. Baris dengan kesalahan tidak ikut tersimpan.</p>
+    <textarea id="up-txt" rows="6" style="width:100%;font:12px ui-monospace,monospace;border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--w)">${esc(upText)}</textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn sm" id="up-prev">Pratinjau</button>
+      <button class="btn sm pri" id="up-save" ${ok ? "" : "disabled"}>Simpan ${ok} baris OK</button></div>
+    ${pre}</div>`;
+}
+function pDate(s) {
+  s = String(s ?? "").trim(); if (!s) return null;
+  let m = s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  throw new Error("tanggal tidak dikenali: " + s);
+}
+function pInt(s) {
+  s = String(s ?? "").trim().replace(/[\s.,]/g, ""); if (!s) return null;
+  if (!/^\d+$/.test(s)) throw new Error("angka tidak valid: " + s);
+  return Number(s);
+}
+function parseUpload(text) {
+  const out = [];
+  String(text || "").split(/\r?\n/).forEach((ln, i) => {
+    if (!ln.trim()) return;
+    const c = ln.includes("\t") ? ln.split("\t") : ln.split(";");
+    if (/^plat$/i.test((c[0] || "").trim())) return;
+    const r = { line: i + 1, err: [] };
+    try {
+      const plate = (c[0] || "").trim().toUpperCase().replace(/\s+/g, " ");
+      if (!plate) throw new Error("plat kosong");
+      r.plate = plate;
+      r.name = (c[1] || "").trim() || null;
+      r.merek_tipe = (c[2] || "").trim() || null;
+      r.speed_limit_kmh = pInt(c[3]);
+      r.odometer_km = pInt(c[4]);
+      const od = pDate(c[5]);
+      r.odometer_at = r.odometer_km != null ? (od ? od + "T00:00:00+07:00" : new Date().toISOString()) : null;
+      r.interval_km = pInt(c[6]);
+      r.interval_bulan = pInt(c[7]);
+      r.svc_last_date = pDate(c[8]);
+      r.svc_last_km = pInt(c[9]);
+      r.stnk_exp = pDate(c[10]);
+      r.kir_exp = pDate(c[11]);
+      const st = (c[12] || "normal").trim().toLowerCase() || "normal";
+      if (!["normal", "service"].includes(st)) throw new Error("status manual harus normal atau service");
+      r.status_manual = st;
+      const cur = (vsCache || []).find(v => v.plate === plate);
+      if (cur && cur.odometer_km != null && r.odometer_km != null && r.odometer_km < cur.odometer_km)
+        throw new Error(`odometer lebih kecil dari sistem (${nfmt(cur.odometer_km)} km)`);
+      r.isNew = !vehicles.some(v => v.plate === plate);
+    } catch (e) { r.err.push(e.message); }
+    out.push(r);
+  });
+  return out;
+}
+async function saveUpload(rows) {
+  let ok = 0; const fail = [];
+  for (const r of rows) {
+    const f = { name: r.name, merek_tipe: r.merek_tipe, speed_limit_kmh: r.speed_limit_kmh, odometer_km: r.odometer_km,
+      odometer_at: r.odometer_at, interval_km: r.interval_km, interval_bulan: r.interval_bulan, svc_last_date: r.svc_last_date,
+      svc_last_km: r.svc_last_km, stnk_exp: r.stnk_exp, kir_exp: r.kir_exp, status_manual: r.status_manual };
+    Object.keys(f).forEach(k => { if (f[k] == null) delete f[k]; });
+    let res;
+    if (r.isNew) res = await sb.from("vehicles").insert({ plate: r.plate, active: true, fleet_id: S.fleet_id, ...f }).select("id");
+    else { const cur = vehicles.find(v => v.plate === r.plate); res = await sb.from("vehicles").update(f).eq("id", cur.id).select("id"); }
+    if (res.error) fail.push(`${r.plate}: ${res.error.message}`);
+    else if (!res.data?.length) fail.push(`${r.plate}: ditolak (cek hak akses)`);
+    else ok++;
+  }
+  return { ok, fail };
+}
+function paintEnd() {
+  const box = $("#dv"), d = sel && drivers.get(sel);
+  if (!box || !d || !isAdmin) return;
+  box.querySelectorAll(".endbox").forEach(e => e.remove());
+  if (stateOf(d) === "off") return;
+  const id = d.id;
+  box.insertAdjacentHTML("beforeend", `<div class="endbox" style="margin-top:12px;border-top:1px solid var(--line);padding-top:10px">
+    <div class="hint" style="margin-bottom:6px">Akhiri tugas jika sopir lupa menekan Selesai.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><select id="end-why" style="flex:1;min-width:160px;padding:8px;border-radius:10px;border:1px solid var(--line)">
+      <option value="">Pilih alasan…</option><option>Lupa selesai</option><option>HP mati</option><option>Kembali ke DC</option></select>
+      <button class="btn sm pri" id="end-go">Akhiri tugas</button></div>
+    <div class="err" id="end-msg"></div></div>`);
+  $("#end-go").onclick = async () => {
+    const why = $("#end-why").value;
+    if (!why) return ($("#end-msg").textContent = "Pilih alasan dulu.");
+    const { data } = await sb.from("shifts").select("id").eq("driver_id", id).is("ended_at", null).order("started_at", { ascending: false }).limit(1);
+    if (!data?.length) return ($("#end-msg").textContent = "Tidak ada sesi tugas aktif.");
+    const { error } = await sb.rpc("end_shift_admin", { p_shift: data[0].id, p_reason: why });
+    if (error) return ($("#end-msg").textContent = error.message);
+    toast("Tugas diakhiri admin.", ""); await load(); await getVehicleStatus(true);
+  };
+}
+// ---------- formulir kendaraan (tambah dan ubah) ----------
+const VF = v => [
+  { k: "plate", label: "Plat nomor", value: v?.plate, placeholder: "BM 1234 GA", required: true },
+  { k: "name", label: "Nama / keterangan (opsional)", value: v?.name },
+  { k: "merek", label: "Merek / tipe", value: v?.merek_tipe, placeholder: "Hino Dutro" },
+  { k: "limit", label: "Batas kecepatan khusus (km/jam)", type: "number", value: v?.speed_limit_kmh ?? "" },
+  { k: "odo", label: "Odometer terakhir (km)", type: "number", value: v?.odometer_km ?? "", hint: "Kosongkan untuk menghapus angka. Angka tidak boleh lebih kecil dari sebelumnya." },
+  { k: "int_km", label: "Interval service (km)", type: "number", value: v?.interval_km ?? "" },
+  { k: "int_bln", label: "Interval service (bulan)", type: "number", value: v?.interval_bulan ?? "" },
+  { k: "svc_tgl", label: "Service terakhir (tanggal)", value: v?.svc_last_date ?? "", placeholder: "dd/mm/yyyy" },
+  { k: "svc_km", label: "Odometer service terakhir (km)", type: "number", value: v?.svc_last_km ?? "" },
+  { k: "stnk", label: "Masa berlaku STNK", value: v?.stnk_exp ?? "", placeholder: "dd/mm/yyyy" },
+  { k: "kir", label: "Masa berlaku KIR", value: v?.kir_exp ?? "", placeholder: "dd/mm/yyyy" },
+  ...(v ? [{ k: "active", label: "Status", type: "select", value: v.active, options: [["true", "Aktif"], ["false", "Nonaktif"]] }] : [])
+];
+function openVehicleForm(v) {
+  ask({ title: v ? "Ubah kendaraan" : "Tambah kendaraan", fields: VF(v), submit: "Simpan", onSubmit: x => saveVehicleForm(x, v) });
+}
+async function saveVehicleForm(x, cur) {
+  let f;
+  try {
+    f = {
+      plate: x.plate.trim().replace(/\s+/g, " ").toUpperCase(),
+      name: x.name.trim() || null, merek_tipe: x.merek.trim() || null,
+      speed_limit_kmh: pInt(x.limit), odometer_km: pInt(x.odo),
+      interval_km: pInt(x.int_km), interval_bulan: pInt(x.int_bln),
+      svc_last_date: pDate(x.svc_tgl), svc_last_km: pInt(x.svc_km),
+      stnk_exp: pDate(x.stnk), kir_exp: pDate(x.kir)
+    };
+  } catch (e) { return e.message; }
+  if (cur) {
+    f.active = x.active === "true";
+    if (f.odometer_km !== (cur.odometer_km ?? null)) f.odometer_at = f.odometer_km != null ? new Date().toISOString() : null;
+  } else if (f.odometer_km != null) f.odometer_at = new Date().toISOString();
+  const res = cur
+    ? await sb.from("vehicles").update(f).eq("id", cur.id)
+    : await sb.from("vehicles").insert({ ...f, fleet_id: S.fleet_id, active: true });
+  if (res.error) return res.error.code === "23505" ? "Plat itu sudah terdaftar." : res.error.message;
+  await load(); await getVehicleStatus(true); drawFleetParts();
+  return null;
+}
+// ---------- pop-up umum (Sopir, Riwayat) ----------
+function openPopup(title, render) {
+  $("#sheet").hidden = false; $("#sheet .sh-h h2").textContent = title;
+  $("#snav").style.display = "none"; $("#sbody").style.gridColumn = "1 / -1";
+  render();
+}
+// ---------- akhiri tugas otomatis (pengaturan) ----------
+function tabAutoEnd() {
+  $("#sbody").innerHTML = `<p class="lead">Sesi tugas yang masih terbuka akan diakhiri otomatis pada jam ini (WIB). Sopir yang lupa menekan Selesai tidak perlu menunggu admin.</p>
+    <div class="blk"><h3>Akhiri tugas otomatis</h3>
+      <div class="fld"><div class="fl"><label for="ae-on">Aktif</label><small>Matikan jika tidak ingin ada pengakhiran otomatis.</small></div>
+        <div class="fi"><input id="ae-on" type="checkbox" ${S.auto_end_enabled ? "checked" : ""} style="width:20px;height:20px"></div></div>
+      <div class="fld"><div class="fl"><label for="ae-time">Jam (WIB)</label><small>Format 24 jam, misalnya 20:00</small></div>
+        <div class="fi"><input id="ae-time" type="time" value="${S.auto_end_time ?? "20:00"}"></div></div>
+    </div>
+    <div class="foot"><span class="err" id="ae-msg"></span><button class="btn pri" id="ae-save">Simpan</button></div>`;
+  $("#ae-save").onclick = async () => {
+    const t = $("#ae-time").value;
+    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(t)) return ($("#ae-msg").textContent = "Jam tidak valid.");
+    const err = await saveSettings({ auto_end_enabled: $("#ae-on").checked, auto_end_time: t });
+    $("#ae-msg").textContent = err || "";
+    if (!err) toast("Pengaturan tersimpan.");
+  };
+}
+// ---------- laporan kejadian dan cek kendaraan ----------
+const RPT_KIND = { kerusakan: "Kerusakan ringan", hampir_celaka: "Hampir celaka", kecelakaan: "Kecelakaan", lainnya: "Lainnya" };
+const RPT_ITEM = { ban: "Ban dan tekanan angin", rem: "Rem", lampu_utama: "Lampu utama dan rem", lampu_sein: "Lampu sein", oli: "Oli mesin", air: "Air radiator", wiper: "Wiper dan air kaca", spion: "Spion", klakson: "Klakson", lampu: "Lampu", bodi: "Kondisi bodi" };
+let rptTab = "kejadian", rptFilter = "semua", rptData = null;
+
+async function signUrls(paths) {
+  const out = [];
+  for (const p of paths || []) {
+    const { data } = await sb.storage.from("incidents").createSignedUrl(p, 3600);
+    if (data && data.signedUrl) out.push(data.signedUrl);
+  }
+  return out;
+}
+async function loadReports() {
+  const [ir, vc, pr] = await Promise.all([
+    sb.from("incident_reports").select("*").order("created_at", { ascending: false }).limit(200),
+    sb.from("vehicle_checks").select("*").order("checked_at", { ascending: false }).limit(200),
+    sb.from("profiles").select("id,full_name")
+  ]);
+  const names = {};
+  (pr.data || []).forEach(p => (names[p.id] = p.full_name));
+  rptData = { ir: ir.data || [], vc: vc.data || [], names, err: ((ir.error || vc.error || {}).message) || "" };
+  for (const r of rptData.ir) r.photos = await signUrls(r.photo_paths);
+  for (const r of rptData.vc) r.photos = await signUrls(r.photo_paths);
+}
+function tabReports() {
+  $("#sbody").innerHTML = '<p class="hint" style="padding:20px">Memuat laporan…</p>';
+  loadReports().then(drawReports);
+}
+function drawReports() {
+  const box = $("#sbody");
+  if (!rptData) return;
+  if (rptData.err) { box.innerHTML = `<p class="err" style="padding:20px">Gagal memuat: ${esc(rptData.err)}</p>`; return; }
+  const isI = rptTab === "kejadian";
+  const newCount = rptData.ir.filter(r => r.status === "baru").length;
+  const chips = isI
+    ? [["semua", "Semua", rptData.ir.length], ["baru", "Baru", newCount], ["ditangani", "Sudah ditangani", rptData.ir.length - newCount]]
+    : [["semua", "Semua", rptData.vc.length], ["bermasalah", "Ada bermasalah", rptData.vc.filter(v => !v.all_ok).length], ["baik", "Semua baik", rptData.vc.filter(v => v.all_ok).length]];
+  const list = isI
+    ? rptData.ir.filter(r => rptFilter === "semua" || r.status === rptFilter).map(incCard).join("")
+    : rptData.vc.filter(v => rptFilter === "semua" || (rptFilter === "bermasalah" ? !v.all_ok : v.all_ok)).map(chkCard).join("");
+  box.innerHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn sm${isI ? " pri" : ""}" data-rtab="kejadian">Kejadian</button>
+      <button class="btn sm${!isI ? " pri" : ""}" data-rtab="cek">Cek kendaraan</button></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${chips.map(([k, l, n]) =>
+      `<button class="btn sm${rptFilter === k ? " pri" : ""}" data-rfil="${k}">${esc(l)} <b>${n}</b></button>`).join("")}</div>
+    ${list || '<p class="hint" style="padding:20px">Belum ada data.</p>'}`;
+  box.querySelectorAll("[data-rtab]").forEach(b => b.onclick = () => { rptTab = b.dataset.rtab; rptFilter = "semua"; drawReports(); });
+  box.querySelectorAll("[data-rfil]").forEach(b => b.onclick = () => { rptFilter = b.dataset.rfil; drawReports(); });
+  box.querySelectorAll("[data-done]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    const { error } = await sb.from("incident_reports").update({ status: "ditangani" }).eq("id", b.dataset.done);
+    if (error) { toast(error.message, "bad"); b.disabled = false; return; }
+    toast("Laporan ditandai sudah ditangani.", "");
+    await loadReports(); drawReports();
+  });
+}
+function photoRow(urls) {
+  return (urls || []).map(u => `<a href="${esc(u)}" target="_blank" rel="noopener"><img src="${esc(u)}" style="width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line)"></a>`).join("");
+}
+function badge(done) {
+  return `<span style="background:${done ? "#1f7a4d" : "#d11f2e"};color:#fff;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:700">${done ? "Ditangani" : "Baru"}</span>`;
+}
+function incCard(r) {
+  const who = rptData.names[r.driver_id] || "Sopir";
+  const when = new Date(r.created_at).toLocaleString("id-ID");
+  const map = r.lat != null ? `<a href="https://www.google.com/maps?q=${r.lat},${r.lng}" target="_blank" rel="noopener" style="color:var(--red);font-weight:700">Lihat lokasi</a>` : '<span class="hint">Lokasi tidak tersedia</span>';
+  const done = r.status === "ditangani";
+  const serius = r.kind === "kecelakaan" || r.kind === "hampir_celaka";
+  return `<div class="card" style="padding:14px;margin-bottom:10px;border-left:4px solid ${serius ? "var(--crim)" : "var(--red)"}">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${esc(RPT_KIND[r.kind] || r.kind)}</b>${badge(done)}</div>
+    <div class="hint" style="margin:4px 0 8px">${esc(r.plate || "–")} · ${esc(who)} · ${esc(when)}</div>
+    <p style="margin-bottom:8px">${esc(r.description)}</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${photoRow(r.photos)}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">${map}${isAdmin && !done ? `<button class="btn sm pri" data-done="${r.id}">Tandai ditangani</button>` : ""}</div></div>`;
+}
+function chkCard(v) {
+  const who = rptData.names[v.driver_id] || "Sopir";
+  const when = new Date(v.checked_at).toLocaleString("id-ID");
+  const items = v.items || {};
+  const bad = Object.keys(RPT_ITEM).filter(k => items[k] === false).map(k => RPT_ITEM[k]);
+  const status = bad.length ? `<span style="color:var(--crim);font-weight:700">Bermasalah: ${esc(bad.join(", "))}</span>` : `<span style="color:#1f7a4d;font-weight:700">Semua baik</span>`;
+  return `<div class="card" style="padding:14px;margin-bottom:10px;border-left:4px solid ${bad.length ? "var(--crim)" : "#1f7a4d"}">
+    <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${esc(v.plate)}</b><span class="hint">${esc(when)}</span></div>
+    <div class="hint" style="margin:4px 0 8px">${esc(who)}</div>
+    <div style="margin-bottom:8px">${status}</div>
+    ${v.notes ? `<p style="margin-bottom:8px">${esc(v.notes)}</p>` : ""}
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${photoRow(v.photos)}</div></div>`;
+}
+// ---------- pengumuman admin ----------
+async function tabAnnounce() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const { data, error } = await sb.from("announcements").select("*").order("created_at", { ascending: false }).limit(20);
+  const people = [...drivers.entries()].map(([id, d]) => ({ id, name: d.full_name || "Sopir" })).sort((a, b) => a.name.localeCompare(b.name));
+  const field = "width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit";
+  const cb = "width:16px;height:16px;margin:0;flex:none;cursor:pointer";
+  const rowList = (data || []).map(a => `<div style="padding:12px 0;border-top:1px solid var(--line)">
+      <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>${a.important ? "[PENTING] " : ""}${esc(a.title)}</b><span class="hint">${esc(new Date(a.created_at).toLocaleString("id-ID"))}</span></div>
+      <div style="margin-top:4px">${esc(a.body)}</div>
+      <div class="hint" style="margin-top:4px">${a.to_all ? "Dikirim ke semua sopir" : "Dikirim ke sopir tertentu"}</div></div>`).join("");
+  box.innerHTML = `
+    <div style="padding:16px;border:1px solid var(--line);border-radius:14px;background:var(--card)">
+      <div style="font-weight:700;margin-bottom:14px">Kirim pengumuman</div>
+
+      <div style="margin-bottom:12px"><div class="hint" style="margin-bottom:6px">Judul</div>
+        <input id="an-title" maxlength="120" style="${field}"></div>
+
+      <div style="margin-bottom:12px"><div class="hint" style="margin-bottom:6px">Isi pengumuman</div>
+        <textarea id="an-body" rows="4" style="${field};resize:vertical"></textarea></div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="an-imp" style="${cb}"><span>Tandai penting</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="an-all" checked style="${cb}"><span>Kirim ke semua sopir</span></div>
+      </div>
+
+      <div id="an-pick" style="display:none;margin-bottom:12px">
+        <div class="hint" style="margin-bottom:6px">Pilih sopir</div>
+        <div style="max-height:220px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 12px">
+          ${people.map(p => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)">
+            <input type="checkbox" class="an-p" value="${p.id}" style="${cb}"><span>${esc(p.name)}</span></div>`).join("")}
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px">
+        <span class="err" id="an-msg"></span>
+        <button class="btn pri" id="an-send">Kirim pengumuman</button>
+      </div>
+    </div>
+
+    <div style="margin:18px 0 6px;font-weight:700">Riwayat pengumuman</div>
+    ${error ? `<p class="err">Gagal memuat: ${esc(error.message)}</p>` : (rowList || '<p class="hint">Belum ada pengumuman.</p>')}`;
+
+  $("#an-all").onchange = () => { $("#an-pick").style.display = $("#an-all").checked ? "none" : "block"; };
+  $("#an-send").onclick = async () => {
+    const title = $("#an-title").value.trim(), body = $("#an-body").value.trim();
+    if (title.length < 3) return ($("#an-msg").textContent = "Judul minimal 3 huruf.");
+    if (body.length < 5) return ($("#an-msg").textContent = "Isi minimal 5 huruf.");
+    const all = $("#an-all").checked;
+    const ids = [...document.querySelectorAll(".an-p:checked")].map(c => c.value);
+    if (!all && !ids.length) return ($("#an-msg").textContent = "Pilih minimal satu sopir.");
+    $("#an-send").disabled = true; $("#an-msg").textContent = "";
+    const { error: e } = await sb.rpc("send_announcement", { p_title: title, p_body: body,
+      p_important: $("#an-imp").checked, p_drivers: all ? null : ids });
+    $("#an-send").disabled = false;
+    if (e) return ($("#an-msg").textContent = e.message);
+    toast("Pengumuman terkirim.", "");
+    tabAnnounce();
+  };
+}
+// ---------- fitur sopir (pengaturan) ----------
+function toggleField(id, label, on) {
+  return `<label style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)"><span>${label}</span><input id="${id}" type="checkbox" ${on ? "checked" : ""} style="width:20px;height:20px"></label>`;
+}
+async function tabFeatures() {
+  const box = $("#sbody");
+  const { data: st } = await sb.from("app_settings").select("chat_enabled,history_enabled,voice_enabled").eq("fleet_id", S.fleet_id).single();
+  const s = st || {};
+  const { data: msgs } = await sb.from("driver_messages").select("*").order("created_at", { ascending: false }).limit(30);
+  const names = {};
+  [...drivers.entries()].forEach(([id, d]) => (names[id] = d.full_name || "Sopir"));
+  const LBL = { sampai: "Sudah sampai", terlambat: "Terlambat", istirahat: "Istirahat", bantuan: "Butuh bantuan" };
+  box.innerHTML = `
+    <p class="lead">Atur fitur yang tampil di aplikasi sopir. Perubahan berlaku saat aplikasi sopir memuat data berikutnya.</p>
+    <div class="blk"><h3>Fitur sopir</h3>
+      ${toggleField("ft-chat", "Chat cepat ke admin", s.chat_enabled !== false)}
+      ${toggleField("ft-voice", "Peringatan suara overspeed", s.voice_enabled !== false)}
+      ${toggleField("ft-hist", "Riwayat perjalanan sendiri", s.history_enabled !== false)}
+    </div>
+    <div class="foot"><span class="err" id="ft-msg"></span><button class="btn pri" id="ft-save">Simpan</button></div>
+    <div class="hd" style="margin:14px 0 8px"><b>Pesan terbaru dari sopir</b></div>
+    ${(msgs || []).map(m => `<div class="card" style="padding:10px 12px;margin-bottom:6px"><b>${esc(LBL[m.kind] || m.kind)}</b> · ${esc(names[m.driver_id] || "Sopir")} <span class="hint">${esc(new Date(m.created_at).toLocaleString("id-ID"))}</span></div>`).join("") || '<p class="hint">Belum ada pesan.</p>'}`;
+  $("#ft-save").onclick = async () => {
+    const err = await saveSettings({
+      chat_enabled: $("#ft-chat").checked,
+      voice_enabled: $("#ft-voice").checked,
+      history_enabled: $("#ft-hist").checked
+    });
+    $("#ft-msg").textContent = err || "";
+    if (!err) toast("Pengaturan fitur tersimpan.", "");
+  };
+}
+// ---------- service: bengkel, order, dan peringatan ----------
+const SV_ST = { menunggu: "Menunggu dimulai", menuju: "Menuju bengkel", di_bengkel: "Di bengkel", ditinggal: "Ditinggal di bengkel" };
+function svPeople() {
+  return [...drivers.entries()].map(([id, d]) => ({ id, name: d.full_name || "Sopir" })).sort((a, b) => a.name.localeCompare(b.name));
+}
+async function tabService() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const [ws, ord, al] = await Promise.all([
+    sb.from("workshops").select("*").order("name"),
+    sb.from("service_orders").select("*").in("status", ["menunggu", "menuju", "di_bengkel", "ditinggal"]).order("created_at", { ascending: false }),
+    sb.from("service_alerts").select("*")
+  ]);
+  const workshops = ws.data || [], orders = ord.data || [], alerts = al.data || [];
+  const people = svPeople();
+  const plates = vehicles.map(v => v.plate);
+  const err = ws.error || ord.error;
+  const inp = "width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)";
+  box.innerHTML = `
+    ${err ? `<p class="err">Gagal memuat: ${esc(err.message)}</p>` : ""}
+    ${alerts.length ? `<div class="card" style="padding:12px 14px;margin-bottom:12px;border-left:4px solid var(--crim)"><b>Perlu perhatian</b>
+      ${alerts.map(a => `<div style="margin-top:6px">${esc(a.plate)}: ${esc(a.alert || "")}</div>`).join("")}</div>` : ""}
+    <div class="card" style="padding:14px;margin-bottom:12px"><b>Buat order service</b>
+      <div style="margin-top:10px"><label class="hint">Kendaraan</label><select id="so-plate" style="${inp}">${plates.map(p => `<option>${esc(p)}</option>`).join("")}</select></div>
+      <div style="margin-top:10px"><label class="hint">Sopir</label><select id="so-driver" style="${inp}">${people.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div>
+      <div style="margin-top:10px"><label class="hint">Bengkel</label><select id="so-ws" style="${inp}">${workshops.map(w => `<option value="${w.id}">${esc(w.name)}</option>`).join("")}</select></div>
+      <div style="margin-top:10px"><label class="hint">Jenis</label><select id="so-jenis" style="${inp}"><option value="rutin">Rutin (pulang bareng kendaraan)</option><option value="tinggal">Ditinggal di bengkel</option></select></div>
+      <div style="margin-top:10px"><label class="hint">Rencana kembali (untuk ditinggal)</label><input type="date" id="so-back" style="${inp}"></div>
+      <div style="margin-top:10px"><label class="hint">Catatan</label><input id="so-notes" style="${inp}"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;flex-wrap:wrap"><span class="err" id="so-msg"></span><button class="btn pri" id="so-save">Buat order</button></div>
+    </div>
+    <div class="card" style="padding:14px;margin-bottom:12px"><b>Order aktif</b>
+      ${orders.length ? orders.map(o => `<div style="border-top:1px solid var(--line);padding:10px 0">
+        <div><b>${esc(o.plate)}</b> · ${o.jenis === "tinggal" ? "Ditinggal" : "Rutin"} · ${esc(SV_ST[o.status] || o.status)}</div>
+        <div class="hint">${esc((people.find(p => p.id === o.driver_id) || {}).name || "Sopir")}${o.planned_return ? " · kembali " + esc(o.planned_return) : ""}</div>
+        ${o.status === "ditinggal" ? `<button class="btn sm" data-pick="${o.id}" style="margin-top:6px">Kendaraan diambil</button>` : ""}
+      </div>`).join("") : '<p class="hint">Tidak ada order aktif.</p>'}
+    </div>
+    <div class="card" style="padding:14px"><b>Bengkel langganan</b>
+      ${workshops.map(w => `<div style="border-top:1px solid var(--line);padding:8px 0;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <span>${esc(w.name)} <span class="hint">radius ${w.radius_m} m${w.active ? "" : " · nonaktif"}</span></span>
+        ${w.active ? `<button class="btn sm" data-wsoff="${w.id}">Nonaktifkan</button>` : ""}</div>`).join("") || '<p class="hint">Belum ada bengkel.</p>'}
+      <div style="margin-top:12px;display:grid;gap:8px">
+        <input id="ws-name" placeholder="Nama bengkel" style="${inp}">
+        <div style="display:flex;gap:8px"><input id="ws-lat" type="number" step="0.00001" placeholder="Latitude" style="${inp}"><input id="ws-lng" type="number" step="0.00001" placeholder="Longitude" style="${inp}"></div>
+        <input id="ws-rad" type="number" value="300" placeholder="Radius (meter)" style="${inp}">
+        <div><button class="btn sm pri" id="ws-add">Tambah bengkel</button> <span class="err" id="ws-msg"></span></div>
+      </div>
+    </div>`;
+
+  $("#so-save").onclick = async () => {
+    const back = $("#so-back").value || null;
+    if ($("#so-jenis").value === "tinggal" && !back) return ($("#so-msg").textContent = "Isi rencana kembali untuk kendaraan yang ditinggal.");
+    $("#so-save").disabled = true;
+    const { error: e } = await sb.rpc("admin_create_order", {
+      p_plate: $("#so-plate").value, p_driver: $("#so-driver").value, p_workshop: $("#so-ws").value,
+      p_jenis: $("#so-jenis").value, p_planned_return: back, p_notes: $("#so-notes").value.trim() });
+    $("#so-save").disabled = false;
+    if (e) return ($("#so-msg").textContent = e.message);
+    toast("Order service dibuat.", "");
+    tabService();
+  };
+  box.querySelectorAll("[data-pick]").forEach(b => b.onclick = async () => {
+    const { error: e } = await sb.rpc("admin_order_pickup", { p_id: b.dataset.pick });
+    if (e) return toast(e.message, "bad");
+    toast("Kendaraan ditandai sudah diambil.", "");
+    tabService();
+  });
+  box.querySelectorAll("[data-wsoff]").forEach(b => b.onclick = async () => {
+    const { error: e } = await sb.from("workshops").update({ active: false }).eq("id", b.dataset.wsoff);
+    if (e) return toast(e.message, "bad");
+    tabService();
+  });
+  $("#ws-add").onclick = async () => {
+    const name = $("#ws-name").value.trim(), lat = Number($("#ws-lat").value), lng = Number($("#ws-lng").value), rad = Number($("#ws-rad").value) || 300;
+    if (name.length < 3) return ($("#ws-msg").textContent = "Nama bengkel minimal 3 huruf.");
+    if (!(lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180)) return ($("#ws-msg").textContent = "Koordinat tidak valid.");
+    const { error: e } = await sb.from("workshops").insert({ fleet_id: S.fleet_id, name, lat, lng, radius_m: rad });
+    if (e) return ($("#ws-msg").textContent = e.message);
+    toast("Bengkel ditambahkan.", "");
+    tabService();
+  };
+}
+// ---------- kode masuk sementara untuk sopir ----------
+async function tabLoginCode() {
+  const box = $("#sbody");
+  const people = svPeople();
+  box.innerHTML = `
+    <p class="lead">Kode masuk sementara untuk sopir yang lupa kata sandi. Kode 6 angka ini berlaku 10 menit dan hanya bisa dipakai sekali. Sopir memasukkannya di kolom kata sandi.</p>
+    <div class="card" style="padding:14px">
+      <label class="hint">Sopir</label>
+      <select id="lc-driver" style="width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)">
+        ${people.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select>
+      <div style="margin-top:12px"><button class="btn pri" id="lc-make">Buat kode</button></div>
+      <div id="lc-out" style="margin-top:14px"></div>
+    </div>`;
+  $("#lc-make").onclick = async () => {
+    const { data, error: e } = await sb.rpc("admin_create_code", { p_driver: $("#lc-driver").value });
+    if (e) return ($("#lc-out").innerHTML = `<span class="err">${esc(e.message)}</span>`);
+    $("#lc-out").innerHTML = `<div style="font-size:34px;font-weight:800;letter-spacing:8px">${esc(String(data))}</div>
+      <div class="hint">Berlaku 10 menit. Berikan kode ini langsung kepada sopir.</div>`;
+  };
+}
+// ---------- status sistem ----------
+async function tabSystem() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memeriksa…</p>';
+  const t0 = Date.now();
+  const [srv, st, last] = await Promise.all([
+    sb.from("fleets").select("id").limit(1),
+    sb.from("app_settings").select("notify_to,notify_types").eq("fleet_id", S.fleet_id).single(),
+    sb.from("reminder_log").select("sent_at").order("sent_at", { ascending: false }).limit(1)
+  ]);
+  const ms = Date.now() - t0;
+  const serverOk = !srv.error;
+  const penerima = ((st.data || {}).notify_to || []).length;
+  const jenis = ((st.data || {}).notify_types || []).length;
+  const waOk = penerima > 0 && jenis > 0;
+  const lastRem = (last.data || [])[0];
+  const row = (ok, title, detail) => `<div class="card" style="padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px">
+    <div><b>${title}</b><div class="hint">${detail}</div></div>
+    <span style="width:12px;height:12px;border-radius:50%;flex:none;background:${ok ? "#1f7a4d" : "#d11f2e"}"></span></div>`;
+  box.innerHTML = `
+    <p class="lead">Kondisi layanan. Diperbarui setiap tab ini dibuka.</p>
+    ${row(serverOk, "Server dan database", serverOk ? `Terhubung (${ms} ms)` : "Tidak terhubung: " + esc(srv.error.message))}
+    ${row(waOk, "Notifikasi WhatsApp", waOk ? `${penerima} nomor penerima, ${jenis} jenis notifikasi aktif` : "Belum ada nomor penerima atau jenis notifikasi aktif")}
+    ${row(!!lastRem, "Pengingat harian", lastRem ? "Terakhir terkirim " + esc(new Date(lastRem.sent_at).toLocaleString("id-ID")) : "Belum pernah mengirim pengingat")}
+    <p class="hint" style="margin-top:8px">Indikator WhatsApp hanya menunjukkan pengaturan. Pengiriman sebenarnya dicek lewat log fungsi server.</p>
+    <div style="margin-top:10px"><button class="btn sm" id="sys-re">Muat ulang</button></div>`;
+  $("#sys-re").onclick = tabSystem;
+}
+// ---------- kejadian koneksi ----------
+async function tabKoneksi() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const { data, error } = await sb.from("kejadian_koneksi").select("*").order("mulai", { ascending: false }).limit(100);
+  const LBL = { sinyal_hilang: "Sinyal hilang", mode_pesawat: "Mode pesawat", baterai_habis: "HP mati (baterai habis)", hp_mati_atau_aplikasi_berhenti: "HP mati atau aplikasi berhenti" };
+  const names = {};
+  [...drivers.entries()].forEach(([id, d]) => (names[id] = d.full_name || "Sopir"));
+  const fmt = t => new Date(t).toLocaleString("id-ID");
+  const rows = (data || []).map(k => {
+    const menit = Math.round((new Date(k.selesai) - new Date(k.mulai)) / 60000);
+    const cek = k.jenis === "hp_mati_atau_aplikasi_berhenti" ? ' <span style="color:var(--crim)">· perlu dicek</span>' : "";
+    return `<div class="card" style="padding:10px 12px;margin-bottom:6px">
+      <b>${esc(names[k.driver_id] || "Sopir")}</b> · ${esc(LBL[k.jenis] || k.jenis)}${cek}
+      <div class="hint">${fmt(k.mulai)} – ${fmt(k.selesai)} (${menit} menit)</div></div>`;
+  }).join("");
+  box.innerHTML = `
+    <p class="lead">Penyebab terputusnya kabar dari HP sopir. Penyebab baru diketahui setelah HP terhubung kembali. Sinyal hilang, mode pesawat, dan HP mati tidak dihitung sebagai pelanggaran. Aplikasi berhenti ditandai "perlu dicek" karena bisa disengaja.</p>
+    ${error ? `<p class="err">Gagal memuat: ${esc(error.message)}</p>` : ""}
+    ${rows || '<p class="hint">Belum ada kejadian.</p>'}`;
+}
+// ---------- deteksi kendaraan (rem mendadak, belok tajam) ----------
+async function tabKendara() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const [st, ev] = await Promise.all([
+    sb.from("app_settings").select("deteksi_kendara,kendara_mode").eq("fleet_id", S.fleet_id).single(),
+    sb.from("kejadian_kendara").select("*").order("waktu", { ascending: false }).limit(100)
+  ]);
+  const s = st.data || {};
+  const names = {};
+  [...drivers.entries()].forEach(([id, d]) => (names[id] = d.full_name || "Sopir"));
+  const LBL = { rem_mendadak: "Rem mendadak", belok_tajam: "Belok tajam" };
+  const inp = "width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)";
+  const rows = (ev.data || []).map(k => `<div class="card" style="padding:10px 12px;margin-bottom:6px">
+      <b>${esc(names[k.driver_id] || "Sopir")}</b> · ${esc(LBL[k.jenis] || k.jenis)} · ${Number(k.nilai).toFixed(1)} m/s²
+      <div class="hint">${esc(new Date(k.waktu).toLocaleString("id-ID"))} · ${k.mode === "uji" ? "mode uji (tidak masuk rapor)" : "masuk rapor"}</div></div>`).join("");
+  box.innerHTML = `
+    <p class="lead">Deteksi rem mendadak (perlambatan 4 m/s² lebih) dan belok tajam (percepatan lateral 3 m/s² lebih). Mode uji hanya mencatat, tidak masuk rapor. Hasil deteksi bergantung pada posisi HP, jadi perlu dicek saat uji jalan.</p>
+    <div class="card" style="padding:14px;margin-bottom:12px">
+      <label style="display:flex;justify-content:space-between;align-items:center;padding:8px 0"><span>Aktifkan deteksi</span><input id="kd-on" type="checkbox" ${s.deteksi_kendara !== false ? "checked" : ""} style="width:20px;height:20px"></label>
+      <div style="margin-top:8px"><label class="hint">Mode</label>
+        <select id="kd-mode" style="${inp}"><option value="uji" ${s.kendara_mode !== "rapor" ? "selected" : ""}>Mode uji (tidak masuk rapor)</option><option value="rapor" ${s.kendara_mode === "rapor" ? "selected" : ""}>Masuk rapor</option></select></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn pri" id="kd-save">Simpan</button></div>
+    </div>
+    <div class="hd" style="margin:6px 0 8px"><b>Kejadian terbaru</b></div>
+    ${rows || '<p class="hint">Belum ada kejadian.</p>'}`;
+  $("#kd-save").onclick = async () => {
+    const err = await saveSettings({ deteksi_kendara: $("#kd-on").checked, kendara_mode: $("#kd-mode").value });
+    if (err) return toast(err, "bad");
+    toast("Pengaturan deteksi tersimpan.", "");
+    tabKendara();
+  };
+}
+// ---------- BBM: km per liter ----------
+async function tabBBM() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const { data, error } = await sb.from("pengisian_bbm").select("*").order("created_at", { ascending: true }).limit(1000);
+  if (error) return (box.innerHTML = `<p class="err">Gagal memuat: ${esc(error.message)}</p>`);
+  const names = {};
+  [...drivers.entries()].forEach(([id, d]) => (names[id] = d.full_name || "Sopir"));
+
+  // km per liter dihitung antara dua pengisian berturut-turut yang sama-sama tangki penuh
+  const byPlate = {};
+  (data || []).forEach(r => (byPlate[r.plate] = byPlate[r.plate] || []).push(r));
+  const perPlate = [];
+  Object.entries(byPlate).forEach(([plate, list]) => {
+    let prev = null; const hasil = [];
+    list.forEach(r => {
+      if (!r.tangki_penuh || r.odometer_km == null) return;
+      if (prev && r.odometer_km > prev.odometer_km && r.liter > 0) {
+        hasil.push({ plate, waktu: r.created_at, driver: r.driver_id, kmpl: (r.odometer_km - prev.odometer_km) / r.liter });
+      }
+      prev = r;
+    });
+    const avg = hasil.length ? hasil.reduce((a, x) => a + x.kmpl, 0) / hasil.length : null;
+    hasil.forEach(x => (x.flag = avg !== null && hasil.length >= 3 && x.kmpl < avg * 0.8));
+    perPlate.push({ plate, avg, count: hasil.length, hasil });
+  });
+  perPlate.sort((a, b) => a.plate.localeCompare(b.plate));
+
+  const flagged = perPlate.flatMap(p => p.hasil.filter(x => x.flag));
+  const tbl = perPlate.map(p => `<tr><td style="padding:8px 6px"><b>${esc(p.plate)}</b></td>
+      <td style="padding:8px 6px">${p.avg !== null ? p.avg.toFixed(2) + " km/l" : "—"}</td>
+      <td style="padding:8px 6px">${p.count}</td></tr>`).join("");
+  box.innerHTML = `
+    <p class="lead">Km per liter dihitung dari pengisian tangki penuh yang berurutan. Pengisian yang angkanya turun lebih dari 20% dari rata-rata kendaraannya ditandai. Tanda ini hanya petunjuk, perlu dicek ulang.</p>
+    ${flagged.length ? `<div class="card" style="padding:12px 14px;margin-bottom:12px;border-left:4px solid var(--crim)"><b>Perlu dicek (${flagged.length})</b>
+      ${flagged.slice(-10).reverse().map(x => `<div style="margin-top:6px">${esc(x.plate)} · ${esc(names[x.driver] || "Sopir")} · ${x.kmpl.toFixed(2)} km/l · ${esc(new Date(x.waktu).toLocaleString("id-ID"))}</div>`).join("")}</div>` : ""}
+    <div class="card" style="padding:12px 14px"><b>Rata-rata per kendaraan</b>
+      ${perPlate.length ? `<table style="width:100%;border-collapse:collapse;margin-top:6px">
+        <tr style="text-align:left"><th style="padding:6px">Plat</th><th style="padding:6px">Rata-rata</th><th style="padding:6px">Data</th></tr>${tbl}</table>`
+        : '<p class="hint" style="margin-top:6px">Belum ada data pengisian.</p>'}
+    </div>`;
+}
+// ---------- wilayah batas kecepatan ----------
+let wlMap = null, wlCircle = null;
+async function tabWilayah() {
+  const box = $("#sbody");
+  box.innerHTML = '<p class="hint" style="padding:20px">Memuat…</p>';
+  const [st, wl] = await Promise.all([
+    sb.from("app_settings").select("wilayah_search").eq("fleet_id", S.fleet_id).single(),
+    sb.from("wilayah_batas").select("*").order("nama")
+  ]);
+  const searchOn = (st.data || {}).wilayah_search !== false;
+  const list = wl.data || [];
+  const inp = "width:100%;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink)";
+  box.innerHTML = `
+    <p class="lead">Batas kecepatan per wilayah. Di dalam lingkaran wilayah, batasnya berlaku menggantikan batas default. Jika beberapa wilayah bertumpuk, yang dipakai adalah wilayah dengan radius terkecil.</p>
+    <div class="card" style="padding:14px;margin-bottom:12px">
+      <label style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+        <span>Pencarian tempat (OpenStreetMap)<br><span class="hint">Mati = admin hanya bisa memasukkan koordinat manual.</span></span>
+        <input id="wl-search-on" type="checkbox" ${searchOn ? "checked" : ""} style="width:20px;height:20px"></label>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn sm" id="wl-search-save">Simpan saklar</button></div>
+    </div>
+    <div class="card" style="padding:14px;margin-bottom:12px"><b>Tambah wilayah</b>
+      <div style="margin-top:10px"><label class="hint">Nama wilayah</label><input id="wl-nama" style="${inp}" placeholder="Contoh: Area DC Bukittinggi"></div>
+      ${searchOn ? `<div style="margin-top:10px"><label class="hint">Cari tempat</label>
+        <div style="display:flex;gap:8px"><input id="wl-q" style="${inp}" placeholder="Contoh: Pasar Pranap"><button class="btn sm" id="wl-find">Cari</button></div>
+        <div id="wl-hits" style="margin-top:6px"></div></div>` : ""}
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <div><label class="hint">Latitude</label><input id="wl-lat" type="number" step="0.00001" style="${inp}"></div>
+        <div><label class="hint">Longitude</label><input id="wl-lng" type="number" step="0.00001" style="${inp}"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+        <div><label class="hint">Radius (meter)</label><input id="wl-rad" type="number" value="2000" min="50" max="20000" style="${inp}"></div>
+        <div><label class="hint">Batas (km/jam)</label><input id="wl-lim" type="number" value="40" min="10" max="130" style="${inp}"></div>
+      </div>
+      <div style="margin-top:10px"><label class="hint">Jenis wilayah (opsional)</label><input id="wl-jenis" style="${inp}" placeholder="Area DC, Jalan tol, Permukiman"></div>
+      <div style="margin-top:10px"><label class="hint">Kecamatan atau desa (opsional, untuk laporan)</label><input id="wl-adm" style="${inp}"></div>
+      <div id="wl-map" style="height:220px;margin-top:12px;border-radius:12px;border:1px solid var(--line)"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;flex-wrap:wrap">
+        <span class="err" id="wl-msg"></span><button class="btn pri" id="wl-save">Simpan wilayah</button></div>
+    </div>
+    <div class="card" style="padding:12px 14px"><b>Daftar wilayah</b>
+      ${list.map(w => `<div style="border-top:1px solid var(--line);padding:10px 0;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap">
+        <div><b>${esc(w.nama)}</b> <span class="hint">${w.aktif ? "" : "· nonaktif"}</span>
+          <div class="hint">radius ${w.radius_m} m · batas ${w.batas_kmh} km/jam${w.jenis ? " · " + esc(w.jenis) : ""}${w.sumber === "pencarian" ? " · dari pencarian" : ""}</div></div>
+        <button class="btn sm" data-wltoggle="${w.id}" data-on="${w.aktif ? 1 : 0}">${w.aktif ? "Nonaktifkan" : "Aktifkan"}</button></div>`).join("") || '<p class="hint">Belum ada wilayah.</p>'}
+    </div>`;
+  // peta pratinjau lingkaran (Leaflet, jika tersedia)
+  if (typeof L !== "undefined") {
+    if (wlMap) { wlMap.remove(); wlMap = null; }
+    wlMap = L.map("wl-map").setView([-0.5, 102], 9);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18 }).addTo(wlMap);
+    const redraw = () => {
+      const la = Number($("#wl-lat").value), ln = Number($("#wl-lng").value), r = Number($("#wl-rad").value) || 2000;
+      if (wlCircle) { wlCircle.remove(); wlCircle = null; }
+      if (Number.isFinite(la) && Number.isFinite(ln) && (la || ln)) {
+        wlCircle = L.circle([la, ln], { radius: r, color: "#378ADD", weight: 2 }).addTo(wlMap);
+        wlMap.fitBounds(wlCircle.getBounds(), { maxZoom: 14 });
+      }
+    };
+    wlMap.on("click", e => { $("#wl-lat").value = e.latlng.lat.toFixed(5); $("#wl-lng").value = e.latlng.lng.toFixed(5); redraw(); });
+    ["wl-lat", "wl-lng", "wl-rad"].forEach(id => $("#" + id).oninput = redraw);
+  }
+  $("#wl-search-save").onclick = async () => {
+    const err = await saveSettings({ wilayah_search: $("#wl-search-on").checked });
+    if (err) return toast(err, "bad");
+    toast("Pengaturan pencarian tersimpan.", "");
+    tabWilayah();
+  };
+  // pencarian tempat lewat OpenStreetMap, dibatasi ke Indonesia
+  if (searchOn) {
+    const find = async () => {
+      const q = $("#wl-q").value.trim();
+      if (q.length < 3) return ($("#wl-msg").textContent = "Ketik nama tempat minimal 3 huruf.");
+      $("#wl-msg").textContent = "";
+      const url = "https://nominatim.openstreetmap.org/search?format=json&limit=5&countrycodes=id&accept-language=id&q=" + encodeURIComponent(q);
+      try {
+        const res = await fetch(url, { headers: { Accept: "application/json" } });
+        const hits = await res.json();
+        $("#wl-hits").innerHTML = hits.length ? hits.map((h, i) => `<div data-hit="${i}" style="padding:6px 8px;border:1px solid var(--line);border-radius:10px;margin-top:4px;cursor:pointer;font-size:13px">${esc(h.display_name)}</div>`).join("")
+          : '<p class="hint">Tidak ditemukan. Coba nama lain, atau isi koordinat manual.</p>';
+        document.querySelectorAll("[data-hit]").forEach(el => el.onclick = () => {
+          const h = hits[Number(el.dataset.hit)];
+          $("#wl-lat").value = Number(h.lat).toFixed(5); $("#wl-lng").value = Number(h.lon).toFixed(5);
+          if (!$("#wl-nama").value.trim()) $("#wl-nama").value = (h.name || q);
+          if (typeof wlMap !== "undefined" && wlMap) { $("#wl-lat").dispatchEvent(new Event("input")); }
+        });
+      } catch (e) { $("#wl-msg").textContent = "Pencarian gagal. Isi koordinat manual."; }
+    };
+    $("#wl-find").onclick = find;
+    $("#wl-q").onkeydown = e => { if (e.key === "Enter") find(); };
+  }
+  $("#wl-save").onclick = async () => {
+    const nama = $("#wl-nama").value.trim(), lat = Number($("#wl-lat").value), lng = Number($("#wl-lng").value);
+    const rad = Number($("#wl-rad").value), lim = Number($("#wl-lim").value);
+    if (nama.length < 3) return ($("#wl-msg").textContent = "Nama wilayah minimal 3 huruf.");
+    if (!(lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) || (!lat && !lng)) return ($("#wl-msg").textContent = "Pilih titik pusat dari pencarian atau peta.");
+    if (!(rad >= 50 && rad <= 20000)) return ($("#wl-msg").textContent = "Radius harus 50 sampai 20.000 meter.");
+    if (!(lim >= 10 && lim <= 130)) return ($("#wl-msg").textContent = "Batas harus 10 sampai 130 km/jam.");
+    $("#wl-save").disabled = true;
+    const { error: e } = await sb.from("wilayah_batas").insert({
+      fleet_id: S.fleet_id, nama, lat, lng, radius_m: Math.round(rad), batas_kmh: Math.round(lim),
+      jenis: $("#wl-jenis").value.trim() || null, lokasi_adm: $("#wl-adm")?.value.trim() || null,
+      sumber: searchOn && $("#wl-hits").innerHTML ? "pencarian" : "manual" });
+    $("#wl-save").disabled = false;
+    if (e) return ($("#wl-msg").textContent = e.message);
+    toast("Wilayah disimpan. Berlaku untuk sopir setelah aplikasi memuat data.", "");
+    tabWilayah();
+  };
+  box.querySelectorAll("[data-wltoggle]").forEach(b => b.onclick = async () => {
+    const { error: e } = await sb.from("wilayah_batas").update({ aktif: b.dataset.on !== "1", updated_at: new Date().toISOString() }).eq("id", b.dataset.wltoggle);
+    if (e) return toast(e.message, "bad");
+    tabWilayah();
+  });
+}
+// ---------- data & realtime ----------
+async function load() {
+  const since = new Date(Date.now() - 7 * 864e5).toISOString();
+  const [p, l, s, v, e, sh, f] = await Promise.all([
+    sb.from("profiles").select("*").order("full_name"),
+    sb.from("driver_latest").select("*"),
+    sb.from("app_settings").select("*").single(),
+    sb.from("vehicles").select("*").order("plate"),
+    sb.from("events").select("*").in("type", ALERT_TYPES).gte("occurred_at", since).order("occurred_at", { ascending: false }).limit(500),
+    sb.from("shifts").select("driver_id").gte("started_at", startOfDay(today()).toISOString()),
+    sb.from("fleets").select("name").limit(1)]);
+  if (s.data) S = s.data;
+  people = p.data || []; vehicles = v.data || []; events = e.data || []; shiftsToday = sh.data || [];
+  if (f.data?.[0]?.name) setFleet(f.data[0].name);
+  latest = new Map((l.data || []).map(x => [x.driver_id, x]));
+  buildDrivers(); render();
+}
+function showSos(ev, i) {
+  const t = document.createElement("div"); t.className = "toast sos";
+  t.innerHTML = `<div><b>DARURAT: ${esc(i.name)}</b><span>${fmtT(ev.occurred_at)} WIB · sopir menekan tombol SOS</span></div><button data-a="go">Lokasi</button><button data-a="x">Tutup</button>`;
+  t.onclick = e => {
+    const a = e.target.dataset.a;
+    if (a === "go") { openDetail(ev.driver_id); if (ev.lat != null) map.flyTo([ev.lat, ev.lng], 16); t.remove(); } else if (a === "x") t.remove();
+  };
+  $("#toasts").appendChild(t); beep(); setTimeout(beep, 400); setTimeout(beep, 800);
+}
+function subscribe() {
+  sb.channel("live")
+    .on("postgres_changes", { event: "*", schema: "public", table: "driver_latest" }, p => { latest.set(p.new.driver_id, p.new); buildDrivers(); render(); })
+    .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, p => {
+      const ev = p.new;
+      if (ALERT_TYPES.includes(ev.type)) {
+        events.unshift(ev); const i = evInfo(ev);
+        if (ev.type === "sos") showSos(ev, i);
+        else { toast(`${i.title} · ${i.name}`, ["overspeed", "offline", "repeat_overspeed"].includes(ev.type) ? "over" : "", () => openDetail(ev.driver_id)); beep(); }
+      } else if (ev.type === "shift_start") shiftsToday.push({ driver_id: ev.driver_id });
+      render();
+    })
+    .subscribe(s => { $("#live").classList.toggle("ok", s === "SUBSCRIBED"); $("#live span").textContent = s === "SUBSCRIBED" ? "Langsung" : "Terputus, mencoba lagi"; });
+}
+// ---------- mulai ----------
+function showTabs() {
+  $("#p-fleet").hidden = tab !== "fleet"; $("#p-alerts").hidden = tab !== "alerts";
+  $("#tabs").querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.t === tab));
+  setNav(tab === "alerts" ? "alerts" : "dash");
+}
+function setNav(n) { $("#nav").querySelectorAll("button").forEach(b => b.classList.toggle("on", b.dataset.n === n)); }
+const flyTo = r => { if (r.dataset.lat) map.flyTo([+r.dataset.lat, +r.dataset.lng], 16, { duration: .6 }); };
+let started = false;
+async function enter() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { $("#gate").hidden = false; $("#app").hidden = true; return; }
+  const { data: me } = await sb.from("profiles").select("id,role,full_name").eq("id", session.user.id).single();
+  if (!["admin", "viewer"].includes(me?.role)) { await sb.auth.signOut(); $("#gate").hidden = false; $("#err").textContent = "Akun ini tidak punya akses dashboard."; return; }
+  meId = me.id; isAdmin = me.role === "admin"; document.body.classList.toggle("viewer", !isAdmin);
+  $("#gate").hidden = true; $("#app").hidden = false;
+  const nm = me.full_name || session.user.email; $("#me").textContent = nm; $("#av").textContent = initial(nm);
+  if (started) return; started = true;
+  initMap(); buildDetail();
+  $("#tabs").onclick = e => { const t = e.target.closest("[data-t]"); if (t) { tab = t.dataset.t; showTabs(); } };
+  $("#b-bell").onclick = () => { tab = "alerts"; showTabs(); };
+  $("#nav").onclick = e => {
+    const b = e.target.closest("[data-n]"); if (!b) return; const n = b.dataset.n;
+    if (n === "dash") { closeSheet(); closeRecap(); tab = "fleet"; showTabs(); }
+    else if (n === "alerts") { closeSheet(); closeRecap(); tab = "alerts"; showTabs(); }
+    else if (n === "recap") { closeRapor(); openRecap(); }
+    else if (n === "rapor") { closeRecap(); openRapor(); }
+    else if (n === "fleetlist") { closeRecap(); closeRapor(); setNav(n); openFleet(); }
+    else if (n === "reports") { closeRecap(); closeRapor(); setNav(n); openPopup("Laporan", tabReports); }
+    else if (n === "announce") { closeRecap(); closeRapor(); setNav(n); openPopup("Pengumuman", tabAnnounce); }
+    else if (n === "service") { closeRecap(); closeRapor(); setNav(n); openPopup("Service", tabService); }
+    else if (n === "drivers" || n === "audit") { closeRecap(); closeRapor(); setNav(n); openPopup(n === "drivers" ? "Sopir" : "Riwayat perubahan", n === "drivers" ? tabDrivers : tabAudit); }
+    else if (isAdmin) { closeRecap(); setNav(n); openSettings(n); }
+  };
+    $("#q").oninput = e => { q = e.target.value; tab = "fleet"; showTabs(); render(); };
+  $("#pick").onchange = e => e.target.value ? openDetail(e.target.value) : closeDetail();
+  $("#chips").onclick = e => { const f = e.target.closest("[data-f]"); if (f) { filter = f.dataset.f; render(); } };
+  const open = e => { const r = e.target.closest(".row"); if (r) openDetail(r.dataset.id); };
+  $("#list").onclick = open; $("#list").onkeydown = e => { if (e.key === "Enter") open(e); }; $("#dlist").onclick = open;
+  const evOpen = e => { const r = e.target.closest("[data-id][data-lat]"); if (r) { if (r.dataset.key) ackAlert(r.dataset.key); openDetail(r.dataset.id); flyTo(r); } };
+  $("#alist").onclick = evOpen; $("#alertcard").onclick = evOpen; $("#alertfs").onclick = evOpen;
+  $("#sclose").onclick = closeSheet; $("#rp-close").onclick = closeRapor; $("#rp-print").onclick = () => window.print(); $("#rclose").onclick = () => { closeRecap(); setNav(tab === "alerts" ? "alerts" : "dash"); };
+  $("#snav").onclick = e => { const b = e.target.closest("[data-s]"); if (b) { stab = b.dataset.s; renderSheet(); } };
+  $("#b-theme").onclick = () => { const t = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = t; try { localStorage.setItem("sg-theme", t); } catch (e) {} };
+  setInterval(() => {
+    const t = new Date().toLocaleTimeString("id-ID", { ...WIB, hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    $("#clock").textContent = t; $("#fsclock").textContent = t;
+  }, 1000);
+  setInterval(render, 5000); setInterval(load, 60000);
+  await load(); fitAll(); subscribe();
+}
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  if (!$("#modal").hidden) $("#modal").hidden = true;
+  else if (!$("#sheet").hidden) closeSheet();
+  else if (!$("#recap").hidden) closeRecap();
+  else if (!$("#rapor").hidden) closeRapor();
+  else if (mc().classList.contains("pfs")) exitFs();
+});
+$("#login").onsubmit = async e => {
+  e.preventDefault(); $("#err").textContent = ""; $("#lbtn").disabled = true;
+  const { error } = await sb.auth.signInWithPassword({ email: $("#em").value.trim(), password: $("#pw").value });
+  $("#lbtn").disabled = false;
+  if (error) $("#err").textContent = /fetch|network/i.test(error.message) ? "Tidak bisa terhubung ke server. Cek config.js dan internet." : "Email atau kata sandi salah."; else enter();
+};
+$("#b-out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+// pasang sebagai aplikasi (PWA)
+addEventListener("beforeinstallprompt", e => { e.preventDefault(); deferredInstall = e; $("#b-install").hidden = false; });
+$("#b-install").onclick = async () => { if (!deferredInstall) return; deferredInstall.prompt(); await deferredInstall.userChoice; deferredInstall = null; $("#b-install").hidden = true; };
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) navigator.serviceWorker.register("sw.js").catch(() => {});
+// laci menu HP
+$("#navtog").onclick = () => document.body.classList.toggle("nav-open");
+$("#navshade").onclick = () => document.body.classList.remove("nav-open");
+$("#nav").addEventListener("click", () => document.body.classList.remove("nav-open"));
+$("#navshade").hidden = false;
+enter();
+</script>
+</body>
+</html>
